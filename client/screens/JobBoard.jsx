@@ -6,7 +6,7 @@ import { AuthContext } from '../contextProviders/AuthContext';
 
 import * as SecureStore from 'expo-secure-store'
 
-import useFetch401Wrapper from '../contextProviders/fetch401Wrapper';
+import useFetchAuthWrapper from '../components/fetchAuthWrapper';
 
 function JobBoard({ navigation }){
     const[productions, setProductions] = useState([])
@@ -17,7 +17,7 @@ function JobBoard({ navigation }){
     const navigate = useNavigation()
 
     // Using the custom fetch wrapper
-    const fetch401Wrapper = useFetch401Wrapper({ navigation });
+    const fetchAuthWrapper = useFetchAuthWrapper({ navigation });
 
     useEffect(() => {
 
@@ -25,7 +25,7 @@ function JobBoard({ navigation }){
             let token = await SecureStore.getItemAsync('accessToken')
 
             try {
-                const responseJSON = await fetch401Wrapper('http://192.168.1.156:5555/productions', {
+                const responseJSON = await fetchAuthWrapper('http://192.168.1.156:5555/productions', {
                 // const responseJSON = await fetch401Wrapper('http://10.129.3.82:5555/productions', {
                     method: 'GET',
                     headers: {
@@ -42,11 +42,6 @@ function JobBoard({ navigation }){
 
         fetchData();
     }, []);
-
-    const handleLogout = async () => {
-        await attemptLogout(); // Call the logout function
-        navigation.navigate('Login'); // Navigate to the login page
-    };
 
     const productionInfo = productions.map((production) => {
         const { name, type, location, unionProduction, id } = production

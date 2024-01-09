@@ -132,7 +132,9 @@ const loginUser = async (req, res, next) => {
     }
 }
 
-// Endpoint for refreshing tokens
+////////////////////
+// Refresh Tokens //
+////////////////////
 const refreshTokens = async (req, res, next) => {
     const { refreshToken } = req.body;
 

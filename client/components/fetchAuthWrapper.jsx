@@ -6,13 +6,13 @@
 // setIsLoggedIn to false with 401 or something of that nature
 
 import React, { useContext } from 'react';
-import { AuthContext } from './AuthContext';
+import { AuthContext } from '../contextProviders/AuthContext';
 
-const useFetch401Wrapper = ({ navigation }) => {
+const useFetchAuthWrapper = ({ navigation }) => {
     const authContext = useContext(AuthContext);
     const { setIsLoggedIn, refreshTokens } = authContext;
 
-    const fetch401Wrapper = async (url, options) => {
+    const fetchAuthWrapper = async (url, options) => {
         try {
             const response = await fetch(url, options);
 
@@ -45,7 +45,7 @@ const useFetch401Wrapper = ({ navigation }) => {
         }
     };
 
-    return fetch401Wrapper;
+    return fetchAuthWrapper;
 };
 
-export default useFetch401Wrapper;
+export default useFetchAuthWrapper;
