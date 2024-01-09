@@ -1,0 +1,70 @@
+import React, { useEffect, useState } from 'react';
+import { ScrollView, View, Text } from 'react-native';
+
+import * as SecureStore from 'expo-secure-store'
+
+import useFetch401Wrapper from '../contextProviders/fetch401Wrapper';
+
+function ProductionDetail ({ route, navigation }) {
+    const { id } = route.params;
+    const [production, setProduction] = useState({})
+    const [productionCompany, setProductionCompany] = useState({})
+
+    const fetch401Wrapper = useFetch401Wrapper({ navigation });
+
+    console.log( id )
+
+    const fetchProductionData = async () => {
+        try {
+            let token = await SecureStore.getItemAsync('accessToken')
+            const responseJSON = await fetch401Wrapper(`http://192.168.1.156:5555/productions/${id}`, {
+            // const responseJSON = await fetch401Wrapper(`http://10.129.3.82:5555/productions/${id}`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                }
+            });
+            setProduction(responseJSON);
+    
+            // Extract productionCompanyId from the responseJSON
+            const productionCompanyId = responseJSON.productionCompanyId;
+    
+            // Make the second fetch using productionCompanyId
+            const pcResponse = await fetch401Wrapper(`http://192.168.1.156:5555/productionCompanies/${productionCompanyId}`, {
+            // const pcResponse = await fetch401Wrapper(`http://10.129.3.82:5555/productionCompanies/${productionCompanyId}`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                }
+            });
+            
+            // await production company data and set it
+            const pcData = await pcResponse;
+            setProductionCompany(pcData);
+        } catch (error) {
+            console.error('Error Fetching Production: ', error);
+        }
+    };
+
+    useEffect(() => {
+        fetchProductionData()
+    }, [])
+
+    return (
+        <View>
+            <ScrollView>
+                <Text>{production.name}</Text>
+                <Text>{production.location}</Text>
+                <Text>{production.type}</Text>
+                <Text>{productionCompany.name}</Text>
+                <Text>{productionCompany.phoneNumber}</Text>
+                <Text>{productionCompany.email}</Text>
+            </ScrollView>
+        </View>
+    )
+
+}
+
+export default ProductionDetail
