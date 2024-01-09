@@ -4,7 +4,7 @@ import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import * as SecureStore from 'expo-secure-store'
 
 import { AuthContext } from '../contextProviders/AuthContext';
-import useFetch401Wrapper from '../contextProviders/fetch401Wrapper';
+import useFetchAuthWrapper from '../components/fetchAuthWrapper';
 
 
 function CrewProfile ({ navigation }) {
@@ -15,7 +15,7 @@ function CrewProfile ({ navigation }) {
     
     // console.log('Within Profile: ', currentUser.data?.username)
 
-    const fetch401Wrapper = useFetch401Wrapper({ navigation });
+    const fetchAuthWrapper = useFetchAuthWrapper({ navigation });
 
     useEffect(() => {
         const fetchData = async () => {
@@ -24,7 +24,7 @@ function CrewProfile ({ navigation }) {
             console.log('Check Access:', user)
 
             try {
-                const responseJSON = await fetch401Wrapper('http://192.168.1.156:5555/users/currentUser', {
+                const responseJSON = await fetchAuthWrapper('http://192.168.1.156:5555/users/currentUser', {
                 // const responseJSON = await fetch401Wrapper(`http://10.129.3.82:5555/users/1`, {
                     method: 'GET',
                     headers: {

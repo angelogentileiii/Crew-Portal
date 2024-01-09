@@ -8,6 +8,7 @@ import JobBoard from './JobBoard';
 import SignUp from './SignUp';
 import CrewProfile from "./CrewProfile";
 import ProductionDetails from "./ProductionDetails";
+import AvailabilitySelector from "../components/AvailabilitySelector"
 
 const Stack = createNativeStackNavigator()
 
@@ -44,6 +45,10 @@ function Home() {
             // <AuthProvider>
                 <NavigationContainer>
                     <Stack.Navigator>
+                    <Stack.Screen
+                        name="Availability"
+                        component={AvailabilitySelector}
+                    />
                     <Stack.Screen 
                         name="Login"
                         component={Login}
