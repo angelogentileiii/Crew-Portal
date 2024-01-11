@@ -7,10 +7,10 @@ router.route('/')
     .get(controller.getCalendarEvents)
     .post(controller.createCalendarEvent)
 
-router.route('/pc/:pcId')
+router.route('/pc/current')
     .get(controller.getCalendarEventsByPC)
 
-router.route('/user/:userId')
+router.route('/user/current')
     .get(controller.getCalendarEventsByUser)
 
 router.route('/:id')

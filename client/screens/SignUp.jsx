@@ -74,7 +74,7 @@ function SignUp ({ navigation }) {
             Vibration.vibrate(5); // Vibrate for 5ms!!
         }
 
-        navigation.navigate('JobBoard')
+        navigation.navigate('HomeScreen')
     }
 
     return (

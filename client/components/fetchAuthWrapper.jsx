@@ -8,6 +8,8 @@
 import React, { useContext } from 'react';
 import { AuthContext } from '../contextProviders/AuthContext';
 
+import * as SecureStore from 'expo-secure-store'
+
 const useFetchAuthWrapper = ({ navigation }) => {
     const authContext = useContext(AuthContext);
     const { setIsLoggedIn, refreshTokens, checkAccessToken } = authContext;
@@ -15,8 +17,17 @@ const useFetchAuthWrapper = ({ navigation }) => {
     const fetchAuthWrapper = async (url, options) => {
         try {
             // await checkAccessToken()
+            let token = await SecureStore.getItemAsync('accessToken')
+            console.log('WITHIN AUTH WRAPPER: ', token)
 
-            const response = await fetch(url, options);
+            const response = await fetch(url, {
+                ...options, 
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'Authorization': `Bearer ${token}` 
+                }
+            });
 
             if (response.status === 401) {
                 try {
@@ -38,7 +49,7 @@ const useFetchAuthWrapper = ({ navigation }) => {
                 } catch (error) {
                     setIsLoggedIn(false);
                     navigation.navigate('Login');
-                    console.error('Error at Beginning of 401', error)
+                    console.error('Error at Beginning of 401 Check', error)
                 }
             }
 

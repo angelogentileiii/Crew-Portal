@@ -7,7 +7,7 @@ export const AuthContext = createContext();
 // creates the provider which holds the functions for context
 export const AuthProvider = ({ children, navigation }) => {
     const [isLoggedIn, setIsLoggedIn] = useState(false)
-    const [currentUserType, setCurrentUserType] = useState({})
+    const [currentUserType, setCurrentUserType] = useState('crew')
 
     // home IP: 'http://192.168.1.156:5555/users'
     // flatiron IP: 'http://10.129.3.82:5555/users'

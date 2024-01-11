@@ -11,9 +11,7 @@ function CrewProfile ({ navigation }) {
     const [pcData, setPCData] = useState({})
 
     const authContext = useContext(AuthContext)
-    const { attemptLogout, currentUser, checkAccessToken } = authContext
-    
-    // console.log('Within Profile: ', currentUser.data?.username)
+    const { attemptLogout, checkAccessToken } = authContext
 
     const fetchAuthWrapper = useFetchAuthWrapper({ navigation });
 
@@ -27,10 +25,6 @@ function CrewProfile ({ navigation }) {
                 // const responseJSON = await fetchAuthWrapper('http://192.168.1.156:5555/users/currentUser', {
                 const responseJSON = await fetchAuthWrapper(`http://10.129.3.82:5555/productionCompanies/currentUser`, {
                     method: 'GET',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Authorization': "Bearer " + token
-                    }
                 })
 
                 setPCData(responseJSON)
@@ -59,7 +53,7 @@ function CrewProfile ({ navigation }) {
                 underlayColor="#1E88E5" // Color when pressed
                 onPress={() => {
                     attemptLogout()
-                    // navigation.navigate('Login')
+                    navigation.navigate('HomeScreen')
                 }}
             >
                 <Text style={styles.buttonText}>Logout?</Text>

@@ -27,10 +27,10 @@ function JobBoard({ navigation }){
                 // const responseJSON = await fetchAuthWrapper('http://192.168.1.156:5555/productions', {
                 const responseJSON = await fetchAuthWrapper('http://10.129.3.82:5555/productions', {
                     method: 'GET',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Authorization': "Bearer " + token
-                    }
+                    // headers: {
+                    //     'Accept': 'application/json',
+                    //     'Authorization': "Bearer " + token
+                    // }
                 });
 
                 console.log('AFTER PRODUCTIONS FETCH: ', responseJSON)

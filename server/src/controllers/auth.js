@@ -26,18 +26,8 @@ const signupUser = async (req, res, next) => {
             return accum
         }, {})
 
-        // if (newUser.password) {
-        //     const saltRounds = 10;
-        //     const hashedPassword = await bcrypt.hash(newUser.password, saltRounds);
-        //     newUser.password = hashedPassword
-        // }
-
         try {
             const user = await User.create(newUser);
-
-            // avoid giving back the hashedpassword in the response
-            // const { password: _, ...userDataWithoutHash } = user.dataValues;
-            // return res.status(201).json(userDataWithoutHash)
 
             try {
                 const accessToken = jwt.sign(
@@ -167,12 +157,6 @@ const signupPC = async (req, res, next) => {
 
         console.log('WITHIN SIGNUP ', newPC)
 
-        // if (newPC.password) {
-        //     const saltRounds = 10;
-        //     const hashedPassword = await bcrypt.hash(newPC.password, saltRounds);
-        //     newPC.password = hashedPassword
-        // }
-
         try {
             const pc = await ProductionCompany.create(newPC);
 
@@ -234,12 +218,6 @@ const loginPC = async (req, res, next) => {
 
     console.log('FOUNDPC: ', foundPC)
     console.log('REQ BODY PWORD: ', password)
-
-    // const hashedPassword = await bcrypt.hash('t123', 10)
-    // console.log('Stored hashed password:', foundPC.password.trim());  // Add this line
-    // console.log('Hashed entered password:', hashedPassword.trim());  // Add this line 
-
-    // if there is no production company with that username
 
     if (!foundPC) {
         return res.status(401).json({message: 'Must enter a valid username.'})
