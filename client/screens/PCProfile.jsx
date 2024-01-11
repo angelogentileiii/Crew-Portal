@@ -8,7 +8,7 @@ import useFetchAuthWrapper from '../components/fetchAuthWrapper';
 
 
 function CrewProfile ({ navigation }) {
-    const [userData, setUserData] = useState({})
+    const [pcData, setPCData] = useState({})
 
     const authContext = useContext(AuthContext)
     const { attemptLogout, currentUser, checkAccessToken } = authContext
@@ -25,7 +25,7 @@ function CrewProfile ({ navigation }) {
 
             try {
                 // const responseJSON = await fetchAuthWrapper('http://192.168.1.156:5555/users/currentUser', {
-                const responseJSON = await fetchAuthWrapper(`http://10.129.3.82:5555/users/currentUser/`, {
+                const responseJSON = await fetchAuthWrapper(`http://10.129.3.82:5555/productionCompanies/currentUser`, {
                     method: 'GET',
                     headers: {
                         'Accept': 'application/json',
@@ -33,7 +33,7 @@ function CrewProfile ({ navigation }) {
                     }
                 })
 
-                setUserData(responseJSON)
+                setPCData(responseJSON)
             }
             catch (error) {
                 console.error('Error occurred while Fetching: ', error)
@@ -60,7 +60,7 @@ function CrewProfile ({ navigation }) {
                 underlayColor="#1E88E5" // Color when pressed
                 onPress={() => {
                     attemptLogout()
-                    navigation.navigate('HomeScreen')
+                    // navigation.navigate('Login')
                 }}
             >
                 <Text style={styles.buttonText}>Logout?</Text>

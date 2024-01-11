@@ -38,6 +38,7 @@ const signupUser = async (req, res, next) => {
             // avoid giving back the hashedpassword in the response
             // const { password: _, ...userDataWithoutHash } = user.dataValues;
             // return res.status(201).json(userDataWithoutHash)
+
             try {
                 const accessToken = jwt.sign(
                     { 
@@ -77,6 +78,7 @@ const signupUser = async (req, res, next) => {
 
 const loginUser = async (req, res, next) => {
     const { username, password } = req.body
+    // console.log("WITHIN LOGIN USER:", req.body)
 
     // basic enter both items
     if (!username || !password) {
@@ -88,7 +90,9 @@ const loginUser = async (req, res, next) => {
         where: {username: username}
     })
 
-    console.log(foundUser)
+    console.log('WITHIN LOGIN USER:', foundUser)
+    console.log('WITHIN LOGIN USER:', foundUser.email)
+    console.log('WITHIN LOGIN USER:', foundUser. username)
 
     // if there is no user with that username
     if (!foundUser) {
@@ -100,6 +104,8 @@ const loginUser = async (req, res, next) => {
 
     // check if the password in request matches the password for the user?
     const matchPassword = await bcrypt.compare(password, foundUser.password);
+
+    console.log('MATCHED PASSWORD:', matchPassword)
 
     if (matchPassword) {
         // don't pass the password!!
@@ -113,6 +119,8 @@ const loginUser = async (req, res, next) => {
             { expiresIn: '15m'}
         );
 
+        console.log('ACCESS TOKEN LOGIN:', accessToken)
+
         // create the refresh token (later expiry)
         const refreshToken = jwt.sign(
             { 
@@ -123,8 +131,9 @@ const loginUser = async (req, res, next) => {
             { expiresIn: '1d'}
         );
         
+        console.log('REFRESH TOKEN LOGIN:', refreshToken)
         
-        return res.status(200).json({
+        res.status(200).json({
             success: true,
             data: {
                 username: foundUser.username,
@@ -309,10 +318,37 @@ const refreshTokens = async (req, res, next) => {
     }
 };
 
+// decode token (not as middleware) //
+
+const decodeToken = (req, res) => {
+    try {
+        const token = req.header('Authorization').split(' ')[1];
+
+        console.log('WITHIN DECODE TOKEN:', token)
+        if (!token) {
+            return res.status(401).json({ success: false, message: 'Error! Token was not provided.' });
+        }
+
+        const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+
+        console.log("WITHIN DECODE:", decodedToken)
+
+        return res.status(200).json(
+            { 
+                success: true, 
+                data: decodedToken 
+            }
+        );
+    } catch (error) {
+        return res.status(401).json({ success: false, message: 'Invalid Token' });
+    }
+};
+
 module.exports = {
     signupUser,
     loginUser,
     signupPC,
     loginPC,
     refreshTokens,
+    decodeToken
 }

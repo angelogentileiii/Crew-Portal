@@ -79,15 +79,14 @@ const useCalendar = (title, color, storeName) => {
         const thereIsACalendar = await _getCalendarStored(storeName);
 
         if (thereIsACalendar) {
-            // const uniqueTag = `${Date.now()}_${Math.floor(Math.random() * 100000)}`;
 
+            // console.log('WITHIN ADD EVENTS FUNC', eventId)
             const event = {
                 title: eventTitle,
                 startDate: eventStartDate,
                 allDay: true,
                 endDate: eventEndDate,
                 timeZone: Localization.timezone,
-                // notes: uniqueTag,
                 alarms: [
                     {
                         relativeOffset: 0,
@@ -96,8 +95,12 @@ const useCalendar = (title, color, storeName) => {
                 ],
             };
 
+            console.log('EVENT', event)
+
             try {
-                await Calendar.createEventAsync(thereIsACalendar, event);
+                const addedEventId = await Calendar.createEventAsync(thereIsACalendar, event);
+                console.log('ADDED EVENT', addedEventId)
+                return addedEventId
             } catch (e) {}
         }
     };

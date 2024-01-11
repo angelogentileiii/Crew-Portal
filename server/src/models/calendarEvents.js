@@ -34,6 +34,10 @@ const CalendarEvent = db.define("calendarEvents_table", {
     commentableType: {
         type: DataTypes.STRING,
         allowNull: false
+    },
+    nativeCalId: {
+        type: DataTypes.STRING,
+        allowNull: false
     }
 },
 {

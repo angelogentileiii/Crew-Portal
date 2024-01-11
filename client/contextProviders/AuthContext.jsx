@@ -52,27 +52,27 @@ export const AuthProvider = ({ children, navigation }) => {
 
     // login function which returns my two tokens
     const attemptLogin = async (userInfo, type) => {
-        const endpoint = type === 'crew' ? '/auth/loginUser' : '/auth/loginPC';
-        console.log('WITHIN LOGIN ENDPOINT: ', endpoint)
-        console.log(`http://192.168.1.156:5555${endpoint}`)
+        const endpoint = await type === 'crew' ? '/auth/loginUser' : '/auth/loginPC';
 
         try {
-            const response = await fetch( `http://192.168.1.156:5555${endpoint}`, {
-            // const response = await fetch( `http://10.129.3.82:5555${endpoint}`, {
+            // const response = await fetch( `http://192.168.1.156:5555${endpoint}`, {
+            const response = await fetch( `http://10.129.3.82:5555${endpoint}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(userInfo),
             });
-            
-            console.log(response.ok)
 
             if (!response.ok) {
                 const errorData = await response.json(); // Parse error response
                 console.error('Login error:', errorData);
             }
+
+            console.log('RESPONSE OK:', response.ok)
+            
             const returnedData = await response.json();
+            console.log('LOGIN RESPONSE AFTER:', returnedData)
 
             await SecureStore.setItemAsync('accessToken', returnedData.data.accessToken.toString())
             await SecureStore.setItemAsync('refreshToken', returnedData.data.refreshToken.toString())
@@ -114,9 +114,9 @@ export const AuthProvider = ({ children, navigation }) => {
             console.log('Within CheckAccess: ', token)
             if (token) {
                 try {
-                    const response = await fetch(`http://192.168.1.156:5555/accessToken`, {
-                    // const response = await fetch(`http://10.129.3.82:5555/accessToken`, {
-                        method: 'GET',
+                    // const response = await fetch(`http://192.168.1.156:5555/accessToken`, {
+                    const response = await fetch(`http://10.129.3.82:5555/auth/decodeToken`, {
+                        method: 'POST',
                         headers: {
                             'Accept': 'application/json',
                             'Authorization': 'Bearer ' + token,
@@ -124,11 +124,11 @@ export const AuthProvider = ({ children, navigation }) => {
                     })
 
                     console.log('Response status:', response.status);
-                    console.log('Before conditional')
+                    // console.log('Before conditional', await response.json())
                     if (response.ok) {
                         const responseJSON = await response.json()
 
-                        console.log('Within checkAccess Condition: ', responseJSON)
+                        // console.log('Within checkAccess Condition: ', responseJSON)
                         setIsLoggedIn(true)
 
                         // setCurrentUser(responseJSON)
@@ -158,8 +158,8 @@ export const AuthProvider = ({ children, navigation }) => {
         console.log("REFRESHING TOKENS CHECK!")
 
         try {
-            const response = await fetch('http://192.168.1.156:5555/auth/refreshToken', {
-            // const response = await fetch('http://10.129.3.82:5555/auth/refreshToken', {
+            // const response = await fetch('http://192.168.1.156:5555/auth/refreshToken', {
+            const response = await fetch('http://10.129.3.82:5555/auth/refreshToken', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -184,13 +184,13 @@ export const AuthProvider = ({ children, navigation }) => {
 
     /// fetch user info from token and set to state
     
-    useEffect(() => {
-        checkAccessToken();
-    }, [])
+    // useEffect(() => {
+    //     checkAccessToken();
+    // }, [])
+
+    // checkAccessToken()
 
     const authContext = {
-        // accessToken,
-        // refreshToken,
         attemptSignup,
         attemptLogin,
         attemptLogout,
