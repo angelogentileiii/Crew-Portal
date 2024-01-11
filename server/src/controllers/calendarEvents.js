@@ -127,12 +127,19 @@ const deleteCalendarEvent = async (req, res, next) => {
 
 const getCalendarEventsByPC = async (req, res, next) => {
     try {
-        const { pcId } = req.params;
+        const { username, email } = req.user;
+
+        const currentUser = await ProductionCompany.findOne({
+            where: {
+                username: username,
+                email: email
+            }
+        })
 
         const calendarEvents = await CalendarEvent.findAll({
             where: {
                 commentableType: 'productionCompany',
-                commentableId: pcId,
+                commentableId: currentUser.id,
             },
         });
 
@@ -150,11 +157,19 @@ const getCalendarEventsByPC = async (req, res, next) => {
 
 const getCalendarEventsByUser = async (req, res, next) => {
     try {
-        const { userId } = req.params;
+        const { username, email } = req.user;
+
+        const currentUser = await User.findOne({
+            where: {
+                username: username,
+                email: email
+            }
+        })
+
         const calendarEvents = await CalendarEvent.findAll({
             where: {
                 commentableType: 'user',
-                commentableId: userId,
+                commentableId: currentUser.id,
             },
         });
 

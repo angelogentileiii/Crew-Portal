@@ -16,13 +16,10 @@ function Calendar({ navigation }) {
     const [selectedEndDate, setSelectedEndDate] = useState(null);
     const [dbEvents, setDBEvents] = useState([])
 
-    // store events with id's fom native calendar
-    const [localEvents, setLocalEvents] = useState([])
-
     const fetchAuthWrapper = useFetchAuthWrapper({ navigation });
 
     const authContext = useContext(AuthContext)
-    const { attemptLogout, checkAccessToken } = authContext
+    const { attemptLogout, currentUserType } = authContext
 
     const {
         createCalendar,
@@ -35,30 +32,32 @@ function Calendar({ navigation }) {
         getEvents,
     } = useCalendar('Crew Portal', '#5351e0', 'Crew Calendar');
 
-    useEffect(() => {
-        const fetchCalEvents = async () => {
-            try {
-                let token = await SecureStore.getItemAsync('accessToken')
-                console.log('WITHIN USEEFFECT:', token)
+    const fetchCalEvents = async () => {
+        const endpoint = currentUserType === 'crew' ? '/user/current' : '/pc/current';
 
-                const responseJSON = await fetchAuthWrapper('http://10.129.3.82:5555/calendarEvents', {
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Authorization': "Bearer " + token
-                    }
-                })
+        try {
+            let token = await SecureStore.getItemAsync('accessToken')
+            console.log('WITHIN USEEFFECT:', token)
 
-                console.log('AFTER CAL EVENTS FETCH: ', responseJSON)
-                setDBEvents(responseJSON)
+            const responseJSON = await fetchAuthWrapper(`http://10.129.3.82:5555/calendarEvents${endpoint}`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Authorization': "Bearer " + token
+                }
+            })
 
-                const events = await getEvents()
-                console.log('GET EVENTS FUNCTION', events)
-            } catch (error) {
-                console.error('Error occurred while fetching:', error);
-            }
+            console.log('AFTER CAL EVENTS FETCH: ', responseJSON)
+            setDBEvents(responseJSON)
+
+            const events = await getEvents()
+            console.log('GET EVENTS FUNCTION', events)
+        } catch (error) {
+            console.error('Error occurred while fetching:', error);
         }
+    }
 
+    useEffect(()=> {
         fetchCalEvents()
     }, [])
 
@@ -108,12 +107,12 @@ function Calendar({ navigation }) {
                     );
                 
                      // Send the event data to your backend
-                await fetchAuthWrapper('http://10.129.3.82:5555/calendarEvents', {
+                await fetchAuthWrapper('http://10.129.3.82:5555/calendarEvents/', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + token,
-                    },
+                    // headers: {
+                    //     'Content-Type': 'application/json',
+                    //     'Authorization': 'Bearer ' + token,
+                    // },
                     body: JSON.stringify({
                         startDate: selectedStartDate,
                         endDate: selectedEndDate,
@@ -121,6 +120,8 @@ function Calendar({ navigation }) {
                         nativeCalId: returnedId
                     }),
                 });
+
+                fetchCalEvents()
 
             } catch (error) {
                 console.error('Error adding event:', error)
@@ -130,10 +131,20 @@ function Calendar({ navigation }) {
         }
     };
 
-    const handleDeleteEvent = (id) => {
-        deleteEventsById(id, 'Crew Calendar')
-        const updatedEvents = dbEvents.filter((event) => event.nativeCalId !== id)
-        setDBEvents(updatedEvents)
+    const handleDeleteEvent = async (nativeId, id) => {
+        try {
+            console.log('WITHIN HANDLE DELETE', id)
+            deleteEventsById(nativeId, 'Crew Calendar')
+            await fetchAuthWrapper(`http://10.129.3.82:5555/calendarEvents/${id}`, {
+                method: 'DELETE',
+            })
+            const updatedEvents = dbEvents.filter((event) => event.nativeCalId !== id)
+            setDBEvents(updatedEvents)
+            fetchCalEvents()
+        }
+        catch (error) {
+            console.error('Error adding event:', error)
+        }
     }
 
     const removeCalendar = () => {
@@ -184,7 +195,7 @@ function Calendar({ navigation }) {
                                 style={styles.smallButton}
                                 underlayColor="#1E88E5" // Color when pressed
                                 onPress={() => {
-                                    handleDeleteEvent(event.nativeCalId)
+                                    handleDeleteEvent(event.nativeCalId, event.id)
                                 }}
                             >
                                 <Text style={styles.buttonText}>Delete Event</Text>

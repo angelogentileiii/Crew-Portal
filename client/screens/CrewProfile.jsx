@@ -11,7 +11,7 @@ function CrewProfile ({ navigation }) {
     const [userData, setUserData] = useState({})
 
     const authContext = useContext(AuthContext)
-    const { attemptLogout, currentUser, checkAccessToken } = authContext
+    const { attemptLogout, checkAccessToken } = authContext
     
     // console.log('Within Profile: ', currentUser.data?.username)
 
@@ -27,10 +27,10 @@ function CrewProfile ({ navigation }) {
                 // const responseJSON = await fetchAuthWrapper('http://192.168.1.156:5555/users/currentUser', {
                 const responseJSON = await fetchAuthWrapper(`http://10.129.3.82:5555/users/currentUser/`, {
                     method: 'GET',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Authorization': "Bearer " + token
-                    }
+                    // headers: {
+                    //     'Accept': 'application/json',
+                    //     'Authorization': "Bearer " + token
+                    // }
                 })
 
                 setUserData(responseJSON)
