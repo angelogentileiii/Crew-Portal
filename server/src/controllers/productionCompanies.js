@@ -81,9 +81,33 @@ const deleteProductionCompany = async (req, res, next) => {
 // more specified routes //
 ///////////////////////////
 
+const getCurrentPC = async (req, res, next) => {
+    try {
+        // Access the user object from req.user set in the middleware
+        const { username, email } = await req.user;
+        const currentPC = await ProductionCompany.findOne({
+            where: {
+                username: username,
+                email: email
+            },
+            attributes: {exclude: ['createdAt', 'updatedAt', 'id', 'password']}
+        })
+
+        const plainPC = currentPC.get({ plain: true });
+
+        // console.log(currentUser)
+        console.log(plainPC)
+
+        return res.status(200).json(plainPC);
+    } catch (error) {
+        return res.status(500).json({ message: 'Error retrieving current user.' });
+    }
+}
+
 module.exports = {
     getProductionCompanies,
     getProductionCompanyById,
     updateProductionCompany,
     deleteProductionCompany,
+    getCurrentPC
 }

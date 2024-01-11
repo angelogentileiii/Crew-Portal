@@ -14,8 +14,15 @@ function App() {
   return (
       <AuthProvider>
         <NavigationContainer>
-          <Stack.Navigator initialRouteName='HomeScreen' headerMode="none">
-            <Stack.Screen name="HomeScreen" component={HomeScreen} />
+          <Stack.Navigator 
+            initialRouteName='HomeScreen'
+            headerMode="none"
+            >
+            <Stack.Screen 
+              name="HomeScreen"
+              component={HomeScreen}
+              options={{ headerShown: false }}
+              />
           </Stack.Navigator>
         </NavigationContainer>
       </AuthProvider>

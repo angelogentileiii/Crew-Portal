@@ -58,7 +58,7 @@ function JobBoard({ navigation }){
                             style={styles.cardButton}
                             underlayColor="#1E88E5" // Color when pressed
                             onPress={() => {
-                                navigation.navigate('ProductionDetails', {id: id})
+                                navigation.push('ProductionDetails', {id: id})
                             }}
                         >
                             <Text style={styles.cardButtonText}>View More</Text>

@@ -165,6 +165,8 @@ const signupPC = async (req, res, next) => {
             return accum
         }, {})
 
+        console.log('WITHIN SIGNUP ', newPC)
+
         // if (newPC.password) {
         //     const saltRounds = 10;
         //     const hashedPassword = await bcrypt.hash(newPC.password, saltRounds);
@@ -243,7 +245,7 @@ const loginPC = async (req, res, next) => {
         return res.status(401).json({message: 'Must enter a valid username.'})
     }
 
-    console.log('FOUNDPC PWORD: ', foundPC.password);
+    console.log('FOUNDPC PWORD: ', foundPC);
     // check if the password in request matches the password for the user?
     const matchPassword = await bcrypt.compareSync(password, foundPC.password);
     // const matchPassword = await bcrypt.compare('t123', foundPC.password);

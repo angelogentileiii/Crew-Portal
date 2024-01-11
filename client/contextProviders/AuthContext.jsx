@@ -7,7 +7,7 @@ export const AuthContext = createContext();
 // creates the provider which holds the functions for context
 export const AuthProvider = ({ children, navigation }) => {
     const [isLoggedIn, setIsLoggedIn] = useState(false)
-    const [currentUser, setCurrentUser] = useState({})
+    const [currentUserType, setCurrentUserType] = useState({})
 
     // home IP: 'http://192.168.1.156:5555/users'
     // flatiron IP: 'http://10.129.3.82:5555/users'
@@ -20,8 +20,8 @@ export const AuthProvider = ({ children, navigation }) => {
         console.log(type)
 
         try {
-            const response = await fetch(`http://192.168.1.156:5555${endpoint}`, {
-            // const response = await fetch(`http://10.129.3.82:5555${endpoint}`, {
+            // const response = await fetch(`http://192.168.1.156:5555${endpoint}`, {
+            const response = await fetch(`http://10.129.3.82:5555${endpoint}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -37,6 +37,7 @@ export const AuthProvider = ({ children, navigation }) => {
                 SecureStore.setItemAsync('refreshToken', returnedData.data.refreshToken.toString())
 
                 setIsLoggedIn(true)
+                setCurrentUserType(type)
 
             } else {
                 console.error('Auth Context - Registration error:', data.error);
@@ -80,6 +81,7 @@ export const AuthProvider = ({ children, navigation }) => {
             console.log('ATOKEN LOGIN FUNCTION:', await SecureStore.getItemAsync('accessToken'))
             
             setIsLoggedIn(true)
+            setCurrentUserType(type)
 
         } catch (error) {
             console.error('Login error:', error);
@@ -180,9 +182,6 @@ export const AuthProvider = ({ children, navigation }) => {
             throw error;
         }
     };
-
-
-    /// fetch user info from token and set to state
     
     // useEffect(() => {
     //     checkAccessToken();
@@ -196,9 +195,9 @@ export const AuthProvider = ({ children, navigation }) => {
         attemptLogout,
         checkAccessToken,
         refreshTokens,
-        isLoggedIn,
         setIsLoggedIn,
-        // currentUser
+        currentUserType,
+        isLoggedIn,
     };
 
     return (
