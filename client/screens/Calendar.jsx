@@ -1,17 +1,28 @@
 
 
 
-import React, { useState } from 'react';
-import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
+import React, { useState, useEffect, useContext } from 'react';
+import { View, ScrollView, StyleSheet, TouchableOpacity, Text } from 'react-native';
 import AvailabilitySelector from '../components/AvailabilitySelector';
 
-// import useCalendar from '@atiladev/usecalendar';
-import useCalendar from '../components/useCalendarHook';
+import * as SecureStore from 'expo-secure-store'
 
-function Calendar() {
+import useCalendar from '../components/useCalendarHook';
+import useFetchAuthWrapper from '../components/fetchAuthWrapper';
+import { AuthContext } from '../contextProviders/AuthContext';
+
+function Calendar({ navigation }) {
     const [selectedStartDate, setSelectedStartDate] = useState(null);
     const [selectedEndDate, setSelectedEndDate] = useState(null);
-    const [events, setEvents] = useState([])
+    const [dbEvents, setDBEvents] = useState([])
+
+    // store events with id's fom native calendar
+    const [localEvents, setLocalEvents] = useState([])
+
+    const fetchAuthWrapper = useFetchAuthWrapper({ navigation });
+
+    const authContext = useContext(AuthContext)
+    const { attemptLogout, checkAccessToken } = authContext
 
     const {
         createCalendar,
@@ -24,6 +35,33 @@ function Calendar() {
         getEvents,
     } = useCalendar('Crew Portal', '#5351e0', 'Crew Calendar');
 
+    useEffect(() => {
+        const fetchCalEvents = async () => {
+            try {
+                let token = await SecureStore.getItemAsync('accessToken')
+                console.log('WITHIN USEEFFECT:', token)
+
+                const responseJSON = await fetchAuthWrapper('http://10.129.3.82:5555/calendarEvents', {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Authorization': "Bearer " + token
+                    }
+                })
+
+                console.log('AFTER CAL EVENTS FETCH: ', responseJSON)
+                setDBEvents(responseJSON)
+
+                const events = await getEvents()
+                console.log('GET EVENTS FUNCTION', events)
+            } catch (error) {
+                console.error('Error occurred while fetching:', error);
+            }
+        }
+
+        fetchCalEvents()
+    }, [])
+
     const handleStartConfirm = async (startDate) => {
         setSelectedStartDate(startDate);
         const permissionGranted = await getPermission();
@@ -31,8 +69,6 @@ function Calendar() {
             openSettings();
         }
     };
-
-    console.log(events)
 
     const handleEndConfirm = async (endDate) => {
         try {
@@ -60,16 +96,32 @@ function Calendar() {
 
         if (selectedStartDate && selectedEndDate) {
             try {
-                // let eventTag = `${Date.now()}_${Math.floor(Math.random() * 100000)}`;
+                let token = await SecureStore.getItemAsync('accessToken')
+                console.log('TOKEN WITHIN SUBMIT:', token)
+
+                // console.log('RESPONSE JSON POSTED CAL:', responseJSON.id)
                 // Event added successfully
-                await addEventsToCalendar(
+                const returnedId = await addEventsToCalendar(
                     'Unavailable To Work', 
                     selectedStartDate, 
                     selectedEndDate,
-                    // eventTag
                     );
-                const updatedEvents = await getEvents();
-                setEvents([...updatedEvents])
+                
+                     // Send the event data to your backend
+                await fetchAuthWrapper('http://10.129.3.82:5555/calendarEvents', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token,
+                    },
+                    body: JSON.stringify({
+                        startDate: selectedStartDate,
+                        endDate: selectedEndDate,
+                        eventName:'Unavailable to Work',
+                        nativeCalId: returnedId
+                    }),
+                });
+
             } catch (error) {
                 console.error('Error adding event:', error)
             }
@@ -80,17 +132,18 @@ function Calendar() {
 
     const handleDeleteEvent = (id) => {
         deleteEventsById(id, 'Crew Calendar')
-        events.filter((event) => event.id !== id)
+        const updatedEvents = dbEvents.filter((event) => event.nativeCalId !== id)
+        setDBEvents(updatedEvents)
     }
 
     const removeCalendar = () => {
-        setEvents([])
+        setDBEvents([])
         deleteCalendar();
     }
 
     return (
         <>
-            <View style={styles.container}>
+            <ScrollView contentContainerStyle={styles.container}>
                 <AvailabilitySelector
                     onStartDateSelected={handleStartConfirm}
                     onEndDateSelected={handleEndConfirm}
@@ -120,11 +173,10 @@ function Calendar() {
                 >
                     <Text style={styles.buttonText}>Remove Calendar</Text>
                 </TouchableOpacity>
-                {events.map((event, index) => {
-                    console.log('first map', event)
-                // return event.map((e, index) => {
+                {dbEvents ? dbEvents.map((event, index) => {
                     return (
                         <View key={index}>
+                            <Text>Calendar Event #{index + 1}</Text>
                             <Text>ID: {event.id}</Text>
                             <Text>Start: {event.startDate}</Text>
                             <Text>End: {event.endDate}</Text>
@@ -132,23 +184,32 @@ function Calendar() {
                                 style={styles.smallButton}
                                 underlayColor="#1E88E5" // Color when pressed
                                 onPress={() => {
-                                    handleDeleteEvent(event.id)
+                                    handleDeleteEvent(event.nativeCalId)
                                 }}
                             >
                                 <Text style={styles.buttonText}>x</Text>
                             </TouchableOpacity>
                         </View>
                     )
-                })}
-            {/* )} */}
-            </View>
+                }): (null)}
+                <TouchableOpacity
+                    style={styles.button}
+                    underlayColor="#1E88E5" // Color when pressed
+                    onPress={() => {
+                        attemptLogout()
+                        navigation.navigate('HomeScreen')
+                    }}
+                >
+                    <Text style={styles.buttonText}>Logout?</Text>
+                </TouchableOpacity>
+            </ScrollView>
         </>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        flexGrow: 1,
         justifyContent: 'center',
         alignItems: 'center',
         padding: 20,

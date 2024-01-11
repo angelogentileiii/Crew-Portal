@@ -17,4 +17,7 @@ router.route('/loginPC')
 router.route('/refreshToken')
     .post(controller.refreshTokens)
 
+router.route('/decodeToken')
+    .post(controller.decodeToken)
+
 module.exports = router

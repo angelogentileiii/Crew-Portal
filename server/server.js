@@ -23,7 +23,7 @@ const calendarEventRoutes = require('./src/routes/calendarEvents.js')
 
 // imported middleware
 // const checkJwtExpiration = require('./src/middlewareFuncs/checkTokenExpiry.js')
-const decodeJwtToken = require('./src/middlewareFuncs/decodeToken.js')
+const decodeJwtToken = require('./src/middlewareFuncs/decodeJWTToken.js')
 
 // allows us to access the json info from requests
 app.use(express.json());

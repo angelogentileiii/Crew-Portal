@@ -36,7 +36,7 @@ const getCalendarEventById = async (req, res, next) => {
 
 const createCalendarEvent = async (req, res) => {
     try {
-        const { startDate, endDate, eventName, productionId } = req.body;
+        const { startDate, endDate, eventName, productionId, nativeCalId } = req.body;
         const { username, email } = await req.user;
 
         const user = await User.findOne({ 
@@ -46,21 +46,26 @@ const createCalendarEvent = async (req, res) => {
             } 
         });
 
-        const plainUser = await user.get({ plain: true })
-        // console.log('Within Post Control: ', plainUser.id)
+        if (!user) {
+            try {
+                const pc = await ProductionCompany.findOne({
+                    where: {
+                        username: username,
+                        email: email
+                    }
+                })
+                const plainPC = pc.get({ plain: true})
 
-        if (plainUser) {
+                commentableType = 'productionCompany',
+                commentableId = plainPC.id
+            }
+            catch (error) {
+                return res.status(500).json({ error: 'Failed to find user or production company.' })
+            }
+        } else {
+            const plainUser = await user.get({ plain: true })
             commentableType = 'user',
             commentableId = plainUser.id
-        } else {
-            const productionCompany = await ProductionCompany.findOne({ 
-                where: { 
-                    username: username, 
-                    email: email 
-                }
-            });
-            commentableType = 'productionCompany',
-            commentableId = productionCompany.id
         }
     
         // Create a new CalendarEvent
@@ -71,6 +76,7 @@ const createCalendarEvent = async (req, res) => {
             eventName,
             commentableId,
             commentableType,
+            nativeCalId
         });
     
         return res.status(201).json(newEvent);

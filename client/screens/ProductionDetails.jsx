@@ -17,8 +17,8 @@ function ProductionDetail ({ route, navigation }) {
     const fetchProductionData = async () => {
         try {
             let token = await SecureStore.getItemAsync('accessToken')
-            const responseJSON = await fetchAuthWrapper(`http://192.168.1.156:5555/productions/${id}`, {
-            // const responseJSON = await fetchAuthWrapper(`http://10.129.3.82:5555/productions/${id}`, {
+            // const responseJSON = await fetchAuthWrapper(`http://192.168.1.156:5555/productions/${id}`, {
+            const responseJSON = await fetchAuthWrapper(`http://10.129.3.82:5555/productions/${id}`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -32,8 +32,8 @@ function ProductionDetail ({ route, navigation }) {
             console.log(productionCompanyId)
     
             // Make the second fetch using productionCompanyId
-            const pcResponse = await fetchAuthWrapper(`http://192.168.1.156:5555/productionCompanies/${productionCompanyId}`, {
-            // const pcResponse = await fetchAuthWrapper(`http://10.129.3.82:5555/productionCompanies/${productionCompanyId}`, {
+            // const pcResponse = await fetchAuthWrapper(`http://192.168.1.156:5555/productionCompanies/${productionCompanyId}`, {
+            const pcResponse = await fetchAuthWrapper(`http://10.129.3.82:5555/productionCompanies/${productionCompanyId}`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',

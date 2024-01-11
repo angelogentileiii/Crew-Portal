@@ -10,10 +10,12 @@ import { AuthContext } from '../contextProviders/AuthContext';
 
 const useFetchAuthWrapper = ({ navigation }) => {
     const authContext = useContext(AuthContext);
-    const { setIsLoggedIn, refreshTokens } = authContext;
+    const { setIsLoggedIn, refreshTokens, checkAccessToken } = authContext;
 
     const fetchAuthWrapper = async (url, options) => {
         try {
+            // await checkAccessToken()
+
             const response = await fetch(url, options);
 
             if (response.status === 401) {
@@ -46,8 +48,7 @@ const useFetchAuthWrapper = ({ navigation }) => {
 
             return response.json();
         } catch (error) {
-            console.error('Error Fetching 401 Auth:', error);
-            throw error;
+            console.warn('Error Fetching 401 Auth:', error);
         }
     };
 

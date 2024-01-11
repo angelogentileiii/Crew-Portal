@@ -29,7 +29,7 @@ function Login({ navigation }) {
       attemptLogin(formData, userType);
     
       // Redirect to home
-      navigation.navigate('JobBoard')
+      navigation.navigate('Calendar')
 
       if (Platform.OS === 'ios' || Platform.OS === 'android') {
         Vibration.vibrate(5); // Vibrate for 5ms!!
