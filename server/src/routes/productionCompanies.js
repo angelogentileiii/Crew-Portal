@@ -4,7 +4,6 @@ const router = Router()
 
 router.route('/')
     .get(controller.getProductionCompanies)
-    .post(controller.createProductionCompany)
 
 router.route('/:id')
     .get(controller.getProductionCompanyById)

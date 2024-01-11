@@ -23,16 +23,19 @@ function JobBoard({ navigation }){
 
         const fetchData = async () => {
             let token = await SecureStore.getItemAsync('accessToken')
+            console.log('WITHIN JOBBOARD ATOKEN: ', token)
 
             try {
                 const responseJSON = await fetchAuthWrapper('http://192.168.1.156:5555/productions', {
-                // const responseJSON = await fetch401Wrapper('http://10.129.3.82:5555/productions', {
+                // const responseJSON = await fetchAuthWrapper('http://10.129.3.82:5555/productions', {
                     method: 'GET',
                     headers: {
                         'Accept': 'application/json',
                         'Authorization': "Bearer " + token
                     }
                 });
+
+                console.log('AFTER DATA FETCH: ', responseJSON)
 
                 setProductions(responseJSON);
             } catch (error) {

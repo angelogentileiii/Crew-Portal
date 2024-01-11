@@ -1,8 +1,10 @@
 require('dotenv').config()
 
-const User = require('../models/users');
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
+
+const User = require('../models/users');
+const ProductionCompany = require('../models/productionCompanies');
 
 /////////////////////////
 // user login / signup //
@@ -24,11 +26,11 @@ const signupUser = async (req, res, next) => {
             return accum
         }, {})
 
-        if (newUser.password) {
-            const saltRounds = 10;
-            const hashedPassword = await bcrypt.hash(newUser.password, saltRounds);
-            newUser.password = hashedPassword
-        }
+        // if (newUser.password) {
+        //     const saltRounds = 10;
+        //     const hashedPassword = await bcrypt.hash(newUser.password, saltRounds);
+        //     newUser.password = hashedPassword
+        // }
 
         try {
             const user = await User.create(newUser);
@@ -61,11 +63,11 @@ const signupUser = async (req, res, next) => {
                 })
             }
             catch (error) {
-                return res.status(500).json({error: error.message})
+                return res.status(500).json({'Error building Tokens': error.message})
             }
         }
         catch (error) {
-            return res.status(500).json({error: error.message});
+            return res.status(500).json({'Error creating new User': error.message});
         }
     }
     catch (error) {
@@ -86,10 +88,15 @@ const loginUser = async (req, res, next) => {
         where: {username: username}
     })
 
+    console.log(foundUser)
+
     // if there is no user with that username
     if (!foundUser) {
         return res.status(401).json({message: 'Must enter a valid username.'})
     }
+
+    console.log('FOUNDPC PWORD: ', foundUser.password)
+    console.log('REQ BODY PWORD: ', password)
 
     // check if the password in request matches the password for the user?
     const matchPassword = await bcrypt.compare(password, foundUser.password);
@@ -132,6 +139,146 @@ const loginUser = async (req, res, next) => {
     }
 }
 
+//////////////////////////////////////
+// productionCompany login / signup //
+//////////////////////////////////////
+
+const signupPC = async (req, res, next) => {
+    try {
+        const modelAttributes = Object.keys(ProductionCompany.rawAttributes);
+
+        const validKeys = Object.keys(req.body).filter((key) => {
+            return modelAttributes.includes(key)
+        })
+
+        const newPC = validKeys.reduce((accum, key) => {
+            accum[key] = req.body[key]
+            return accum
+        }, {})
+
+        // if (newPC.password) {
+        //     const saltRounds = 10;
+        //     const hashedPassword = await bcrypt.hash(newPC.password, saltRounds);
+        //     newPC.password = hashedPassword
+        // }
+
+        try {
+            const pc = await ProductionCompany.create(newPC);
+
+            try {
+                const accessToken = jwt.sign(
+                    { 
+                        "username": pc.username,
+                        "email": pc.email,
+                    },
+                    process.env.ACCESS_TOKEN_SECRET,
+                    { expiresIn: '120s'}
+                );
+
+                const refreshToken = jwt.sign(
+                    { 
+                        "username": pc.username,
+                        "email": pc.email,
+                    },
+                    process.env.REFRESH_TOKEN_SECRET,
+                    { expiresIn: '1d'}
+                );
+                
+                return res.status(201).json({
+                    success: true,
+                    data: {
+                        username: pc.username,
+                        email: pc.email,
+                        accessToken: accessToken,
+                        refreshToken: refreshToken
+                    }
+                })
+            }
+            catch (error) {
+                return res.status(500).json({'Error building tokens': error.message})
+            }
+        }
+        catch (error) {
+            return res.status(500).json({'Error creating new Production Company': error.message});
+        }
+    }
+    catch (error) {
+        return res.status(500).json({error: error.message});
+    }
+}
+
+const loginPC = async (req, res, next) => {
+    console.log('WITHIN LOGINPC', req.body)
+    const { username, password } = req.body
+
+    // basic enter both items
+    if (!username || !password) {
+        return res.status(400).json({message: 'Username/Password are required.'})
+    }
+
+    // check to see if there is a user with the username entered
+    const foundPC = await ProductionCompany.findOne({
+        where: {username: username}
+    })
+
+    console.log('FOUNDPC: ', foundPC)
+    console.log('REQ BODY PWORD: ', password)
+
+    // const hashedPassword = await bcrypt.hash('t123', 10)
+    // console.log('Stored hashed password:', foundPC.password.trim());  // Add this line
+    // console.log('Hashed entered password:', hashedPassword.trim());  // Add this line 
+
+    // if there is no production company with that username
+
+    if (!foundPC) {
+        return res.status(401).json({message: 'Must enter a valid username.'})
+    }
+
+    console.log('FOUNDPC PWORD: ', foundPC.password);
+    // check if the password in request matches the password for the user?
+    const matchPassword = await bcrypt.compareSync(password, foundPC.password);
+    // const matchPassword = await bcrypt.compare('t123', foundPC.password);
+
+    console.log('MATCH PWORD: ', matchPassword);
+
+    if (matchPassword) {
+        // don't pass the password!!
+        // create the access token (short expiry)
+        const accessToken = jwt.sign(
+            { 
+                "username": foundPC.username,
+                "email": foundPC.email,
+            },
+            process.env.ACCESS_TOKEN_SECRET,
+            { expiresIn: '15m'}
+        );
+
+        // create the refresh token (later expiry)
+        const refreshToken = jwt.sign(
+            { 
+                "username": foundPC.username,
+                "email": foundPC.email
+            },
+            process.env.REFRESH_TOKEN_SECRET,
+            { expiresIn: '1d'}
+        );
+        
+        
+        return res.status(200).json({
+            success: true,
+            data: {
+                username: foundPC.username,
+                email: foundPC.email,
+                accessToken: accessToken,
+                refreshToken: refreshToken
+            }
+        })
+        
+    } else {
+        return res.status(401).json({message: "Incorrect PC Login information."})
+    }
+}
+
 ////////////////////
 // Refresh Tokens //
 ////////////////////
@@ -165,5 +312,7 @@ const refreshTokens = async (req, res, next) => {
 module.exports = {
     signupUser,
     loginUser,
+    signupPC,
+    loginPC,
     refreshTokens,
 }

@@ -1,33 +1,34 @@
-const Sequelize = require('sequelize');
+const { DataTypes } = require('sequelize');
 const db = require('../utils/db')
+
 const ProductionCompany = require('./productionCompanies')
 
 const Production = db.define('productions_table', {
     id: {
-        type: Sequelize.INTEGER,
+        type: DataTypes.INTEGER,
         autoIncrement: true,
             allowNull: false,
             primaryKey: true
     },
     name: {
-        type: Sequelize.STRING,
+        type: DataTypes.STRING,
         allowNull: false
     },
     type: {
-        type: Sequelize.STRING,
+        type: DataTypes.STRING,
         allowNull: false
     },
     location: {
-        type: Sequelize.STRING,
+        type: DataTypes.STRING,
         allowNull: false
     },
     unionProduction: {
-        type: Sequelize.BOOLEAN,
+        type: DataTypes.BOOLEAN,
         allowNull: false
     },
     productionCompanyId: {
-        type: Sequelize.INTEGER,
-        allowNull: true
+        type: DataTypes.INTEGER,
+        allowNull: false
     }
 },
 {
