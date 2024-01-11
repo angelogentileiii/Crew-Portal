@@ -187,7 +187,7 @@ function Calendar({ navigation }) {
                                     handleDeleteEvent(event.nativeCalId)
                                 }}
                             >
-                                <Text style={styles.buttonText}>x</Text>
+                                <Text style={styles.buttonText}>Delete Event</Text>
                             </TouchableOpacity>
                         </View>
                     )
@@ -230,7 +230,8 @@ const styles = StyleSheet.create({
         backgroundColor: '#2196F3', // Button background color
         padding: 3,
         borderRadius: 8,
-        width: 20,
+        width: 80,
+        margin: 5,
     }
 });
 

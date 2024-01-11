@@ -43,17 +43,16 @@ function CrewProfile ({ navigation }) {
         fetchData()
     }, [])
 
-    // console.log('USER DATA:', userData)
+    console.log('USER DATA:', pcData)
 
     return (
         <View>
             <View>
-                <Text>{userData.firstName}</Text>
-                <Text>{userData.lastName}</Text>
-                <Text>{userData.address}</Text>
-                <Text>{userData.email}</Text>
-                <Text>{userData.phoneNumber}</Text>
-                <Text>{userData.unionNumber}</Text>
+                <Text>{pcData.companyName}</Text>
+                <Text>{pcData.address}</Text>
+                <Text>{pcData.email}</Text>
+                <Text>{pcData.phoneNumber}</Text>
+                <Text>{pcData.unionNumber}</Text>
             </View>
             <TouchableOpacity
                 style={styles.button}
