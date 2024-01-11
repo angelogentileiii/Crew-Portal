@@ -25,7 +25,7 @@ function CrewProfile ({ navigation }) {
 
             try {
                 const responseJSON = await fetchAuthWrapper('http://192.168.1.156:5555/users/currentUser', {
-                // const responseJSON = await fetch401Wrapper(`http://10.129.3.82:5555/users/1`, {
+                // const responseJSON = await fetchAuthWrapper(`http://10.129.3.82:5555/users/currentUser`, {
                     method: 'GET',
                     headers: {
                         'Accept': 'application/json',

@@ -1,4 +1,4 @@
-const { Sequelize, DataTypes } = require('sequelize');
+const { DataTypes } = require('sequelize');
 const db = require('../utils/db')
 const bcrypt = require('bcrypt')
 
@@ -20,7 +20,7 @@ const User = db.define('users_table', {
     email: {
         type: DataTypes.STRING,
         allowNull: false,
-        uniique: true,
+        unique: true,
         validate: {
             isEmail: true 
         }
@@ -47,7 +47,7 @@ const User = db.define('users_table', {
         unique: true
     },
     password: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(100),
         allowNull: false
     }
 }, 
@@ -57,16 +57,17 @@ const User = db.define('users_table', {
 
 //hash password before saving User instance
 User.beforeCreate(async (user) => {
-    if (user.changed('hashedPassword')) {
+    console.log('BEFORE SAVE USER PASSWORD')
+    if (user.changed('password')) {
         const saltRounds = 10;
-        const hashedPassword = await bcrypt.hash(user.hashedPassword, saltRounds);
-        user.hashedPassword = hashedPassword
+        const hashedPassword = await bcrypt.hash(user.password, saltRounds);
+        user.password = hashedPassword
     }
 })
 
 // method to make sure passwords match during login
-User.prototype.checkPassword = async (passwordAttempt) => {
-    return await bcrypt.compare(passwordAttempt, this.hashedPassword)
+User.prototype.checkPassword = async function (passwordAttempt) {
+    return await bcrypt.compare(passwordAttempt, this.password)
 }
 
 module.exports = User

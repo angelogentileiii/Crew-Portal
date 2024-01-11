@@ -23,6 +23,11 @@ const useFetchAuthWrapper = ({ navigation }) => {
                         // Retry the original request with the new access token
                         options.headers.Authorization = `Bearer ${refreshedToken}`;
                         const retryResponse = await fetch(url, options);
+                        
+                        if (!retryResponse.ok) {
+                            throw new Error(`HTTP Error! Status: ${retryResponse.status}`);
+                        }
+
                         return retryResponse.json();
                     } else {
                         setIsLoggedIn(false);
@@ -31,6 +36,7 @@ const useFetchAuthWrapper = ({ navigation }) => {
                 } catch (error) {
                     setIsLoggedIn(false);
                     navigation.navigate('Login');
+                    console.error('Error at Beginning of 401', error)
                 }
             }
 
@@ -40,7 +46,7 @@ const useFetchAuthWrapper = ({ navigation }) => {
 
             return response.json();
         } catch (error) {
-            console.error('Error Fetching:', error);
+            console.error('Error Fetching 401 Auth:', error);
             throw error;
         }
     };

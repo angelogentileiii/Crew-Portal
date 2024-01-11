@@ -11,6 +11,9 @@ function SignUp ({ navigation }) {
     const [streetAddress, setStreetAddress] = useState('');
     const [cityState, setCityState] = useState('');
     const [zipCode, setZipCode] = useState('');
+    const [userType, setUserType] = useState('crew')
+
+    console.log(userType)
 
     const { register, setValue, handleSubmit } = useForm()
 
@@ -40,124 +43,197 @@ function SignUp ({ navigation }) {
         let address = `${streetAddress}, ${cityState} ${zipCode}`
         setValue('address', address);
 
-    }, [setValue, streetAddress, cityState, zipCode, isUnionMember, selectedUnionNumber])
+    }, [setValue, streetAddress, cityState, zipCode, isUnionMember, selectedUnionNumber, userType])
 
     useEffect(() => {
         setValue('unionMember', isUnionMember);
-        console.log('Within useEffect:', selectedUnionNumber)
         setValue('unionNumber', Number(selectedUnionNumber))
     }, [isUnionMember, selectedUnionNumber, setValue]);
 
+    const fieldNamesCrew = [
+        'firstName', 'lastName', 'address',
+        'email', 'phoneNumber', 'unionMember',
+        'unionNumber', 'username', 'password',
+    ];
+
+    const fieldNamesPC = [
+        'companyName', 'address', 'email',
+        'phoneNumber', 'username', 'password',
+    ];
+
     useEffect(() => {
-        register('firstName')
-        register('lastName')
-        register('address')
-        register('email')
-        register('phoneNumber')
-        register('unionMember') // dropdown later on
-        register('unionNumber') // dropdown later on
-        register('username')
-        register('password')
+        const fields = userType === 'crew' ? fieldNamesCrew : fieldNamesPC;
+        fields.forEach((field) => register(field))
     }, [register])
 
-    const onSubmit = useCallback(formData => {
+    const onSubmit = (formData) => {
         console.log(formData)
-        attemptSignup(formData)
+        attemptSignup(formData, userType)
 
         if (Platform.OS === 'ios' || Platform.OS === 'android') {
-            Vibration.vibrate(35); // Vibrate for 35ms!!
+            Vibration.vibrate(5); // Vibrate for 5ms!!
         }
-    }, [])
 
-    // console.log('Outside everything:', selectedUnionNumber)
+        navigation.navigate('JobBoard')
+    }
 
     return (
         <View style={styles.container}>
-            {/* <Text style={styles.title}>Create New Account</Text> */}
             <ScrollView style={styles.form} contentContainerStyle={styles.formContent}>
                 <Text style={styles.title}>Create New Account</Text>
-                <TextInput
+                {/* Toggle for choosing user type */}
+                <View style={styles.checkboxContainer}>
+                    <Text style={styles.checkboxLabel}>Account Type: </Text>
+                        <TouchableOpacity
+                            style={[styles.checkBox, userType === 'crew' ? styles.activeCheckBox : null]}
+                            onPress={() => setUserType('crew')}
+                        >
+                        </TouchableOpacity>
+                    <Text>Crew</Text>
+                        <TouchableOpacity
+                            style={[styles.checkBox, userType === 'productionCompany' ? styles.activeCheckBox : null]}
+                            onPress={() => setUserType('productionCompany')}
+                        >
+                        </TouchableOpacity>
+                    <Text>Production Company</Text>
+                </View>
+
+                {userType === 'crew' ? (
+                <>
+                    <TextInput
+                        style={styles.input}
+                        placeholder='First Name'
+                        autoCapitalize='none'
+                        onChangeText={onFieldChange('firstName')}
+                    />
+                    <TextInput
+                        style={styles.input}
+                        placeholder='Last Name'
+                        autoCapitalize='none'
+                        onChangeText={onFieldChange('lastName')}
+                    />
+                    <TextInput
+                        style={styles.input}
+                        placeholder='Street Address'
+                        autoCapitalize='none'
+                        onChangeText={onFieldChange('streetAddress')}
+                    />
+                    <TextInput
+                        style={styles.input}
+                        placeholder='City/State'
+                        autoCapitalize='none'
+                        onChangeText={onFieldChange('cityState')}
+                    />
+                    <TextInput
+                        style={styles.input}
+                        placeholder='Zip Code'
+                        autoCapitalize='none'
+                        onChangeText={onFieldChange('zipCode')}
+                    />
+                    <TextInput
+                        style={styles.input}
+                        placeholder='Email Address'
+                        autoCapitalize='none'
+                        onChangeText={onFieldChange('email')}
+                    />
+                    <TextInput
+                        style={styles.input}
+                        placeholder='Phone Number'
+                        autoCapitalize='none'
+                        onChangeText={onFieldChange('phoneNumber')}
+                    />
+                    <TextInput
+                        style={styles.input}
+                        placeholder='Username'
+                        autoCapitalize='none'
+                        onChangeText={onFieldChange('username')}
+                    />
+                    <TextInput
+                        style={styles.input}
+                        placeholder='Password'
+                        autoCapitalize='none'
+                        onChangeText={onFieldChange('password')}
+                    />
+                    <View style={styles.checkboxContainer}>
+                        <Text style={styles.checkboxLabel}>Union Member? </Text>
+                        <TouchableOpacity
+                            style={[styles.checkBox, isUnionMember ? styles.activeCheckBox : null]}
+                            onPress={() => setIsUnionMember(!isUnionMember)}
+                            >
+                        </TouchableOpacity>
+                    </View>
+                    {isUnionMember ? 
+                        <View style={styles.selectContainer}>
+                            <SelectList
+                                boxStyles={{borderColor: '#ccc', color:'#ccc'}}
+                                dropdownStyles={{borderColor: '#ccc'}}
+                                inputStyles={{borderColor: '#ccc'}}
+                                label='Unions:'
+                                placeholder='Select Union Number'
+                                setSelected={(val) => setSelectedUnionNumber(val)}
+                                data={unionNumbers}
+                                onSelect={() => {
+                                    setSelectedUnionNumber(selectedUnionNumber)
+                                    console.log('Within onSelect:', selectedUnionNumber)
+                                }}
+                                save='key'
+                                badgeStyles={{backgroundColor: '#2196F3' }}
+                                search={false}
+                            />
+                        </View> : null
+                    }
+                </>
+                ) : (
+                <>
+                    <TextInput
                     style={styles.input}
-                    placeholder='First Name'
+                    placeholder='Company Name'
                     autoCapitalize='none'
-                    onChangeText={onFieldChange('firstName')}
-                />
-                <TextInput
-                    style={styles.input}
-                    placeholder='Last Name'
-                    autoCapitalize='none'
-                    onChangeText={onFieldChange('lastName')}
-                />
-                <TextInput
+                    onChangeText={onFieldChange('companyName')}
+                    />
+                    <TextInput
                     style={styles.input}
                     placeholder='Street Address'
                     autoCapitalize='none'
                     onChangeText={onFieldChange('streetAddress')}
-                />
-                <TextInput
-                    style={styles.input}
-                    placeholder='City/State'
-                    autoCapitalize='none'
-                    onChangeText={onFieldChange('cityState')}
-                />
-                <TextInput
-                    style={styles.input}
-                    placeholder='Zip Code'
-                    autoCapitalize='none'
-                    onChangeText={onFieldChange('zipCode')}
-                />
-                <TextInput
-                    style={styles.input}
-                    placeholder='Email Address'
-                    autoCapitalize='none'
-                    onChangeText={onFieldChange('email')}
-                />
-                <TextInput
-                    style={styles.input}
-                    placeholder='Phone Number'
-                    autoCapitalize='none'
-                    onChangeText={onFieldChange('phoneNumber')}
-                />
-                <TextInput
-                    style={styles.input}
-                    placeholder='Username'
-                    autoCapitalize='none'
-                    onChangeText={onFieldChange('username')}
-                />
-                <TextInput
-                    style={styles.input}
-                    placeholder='Password'
-                    autoCapitalize='none'
-                    onChangeText={onFieldChange('password')}
-                />
-                <View style={styles.checkboxContainer}>
-                    <Text style={styles.checkboxLabel}>Union Member? </Text>
-                    <TouchableOpacity
-                        style={[styles.checkBox, isUnionMember ? styles.activeCheckBox : null]}
-                        onPress={() => setIsUnionMember(!isUnionMember)}
-                        >
-                    </TouchableOpacity>
-                </View>
-                {isUnionMember ? 
-                    <View style={styles.selectContainer}>
-                        <SelectList
-                            boxStyles={{borderColor: '#ccc', color:'#ccc'}}
-                            dropdownStyles={{borderColor: '#ccc'}}
-                            inputStyles={{borderColor: '#ccc'}}
-                            label='Unions:'
-                            placeholder='Select Union Number'
-                            setSelected={(val) => setSelectedUnionNumber(val)}
-                            data={unionNumbers}
-                            onSelect={() => {
-                                setSelectedUnionNumber(selectedUnionNumber)
-                                console.log('Within onSelect:', selectedUnionNumber)
-                            }}
-                            save='key'
-                            badgeStyles={{backgroundColor: '#2196F3' }}
-                            search={false}
-                        />
-                    </View> : null
-                }
+                    />
+                    <TextInput
+                        style={styles.input}
+                        placeholder='City/State'
+                        autoCapitalize='none'
+                        onChangeText={onFieldChange('cityState')}
+                    />
+                    <TextInput
+                        style={styles.input}
+                        placeholder='Zip Code'
+                        autoCapitalize='none'
+                        onChangeText={onFieldChange('zipCode')}
+                    />
+                    <TextInput
+                        style={styles.input}
+                        placeholder='Email Address'
+                        autoCapitalize='none'
+                        onChangeText={onFieldChange('email')}
+                    />
+                    <TextInput
+                        style={styles.input}
+                        placeholder='Phone Number'
+                        autoCapitalize='none'
+                        onChangeText={onFieldChange('phoneNumber')}
+                    />
+                    <TextInput
+                        style={styles.input}
+                        placeholder='Username'
+                        autoCapitalize='none'
+                        onChangeText={onFieldChange('username')}
+                    />
+                    <TextInput
+                        style={styles.input}
+                        placeholder='Password'
+                        autoCapitalize='none'
+                        onChangeText={onFieldChange('password')}
+                    />
+                </>)}
                 <TouchableOpacity
                     style={styles.button}
                     underlayColor="#1E88E5" // Color when pressed

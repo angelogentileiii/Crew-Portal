@@ -5,11 +5,16 @@ const ProductionCompany = require('../models/productionCompanies')
 /////////////////////
 const getProductionCompanies = async (req, res, next) => {
     try {
-        const productionCompanys = await ProductionCompany.findAll();
-        return res.status(200).json(productionCompanys)
+        const productionCompanies = await ProductionCompany.findAll();
+        
+        if (!productionCompanies) {
+            res.status(404).json('No production companies found.')
+        }
+        const plainProductionCompanies = productionCompanies.get({ plain: true })
+        return res.status(200).json(plainProductionCompanies)
     }
     catch (error) {
-        return res.status(404).json({error: error.message});
+        return res.status(500).json({error: error.message});
     }
 }
 
@@ -17,33 +22,11 @@ const getProductionCompanyById = async (req, res, next) => {
     try{
         // findByPk means find by primary key (aka id)
         const productionCompany = await ProductionCompany.findByPk(req.params.id)
-        return res.status(200).json(productionCompany)
-    }
-    catch (error) {
-        return res.status(404).json({error: error.message})
-    }
-}
-
-const createProductionCompany = async (req, res, next) => {
-    try {
-        const modelAttributes = Object.keys(ProductionCompany.rawAttributes);
-
-        const validKeys = Object.keys(req.body).filter((key) => {
-            return modelAttributes.includes(key)
-        })
-
-        const newProductionCompany = validKeys.reduce((accum, key) => {
-            accum[key] = req.body[key]
-            return accum
-        }, {})
-
-        try {
-            const productionCompany = await ProductionCompany.create(newProductionCompany);
-            return res.status(201).json(productionCompany)
+        if (!productionCompany) {
+            return res.status(404).json('No production company found.')
         }
-        catch (error) {
-            return res.status(500).json({error: error.message});
-        }
+        const plainProductionCompany = productionCompany.get({ plain: true })
+        return res.status(200).json(plainProductionCompany)
     }
     catch (error) {
         return res.status(500).json({error: error.message});
@@ -101,7 +84,6 @@ const deleteProductionCompany = async (req, res, next) => {
 module.exports = {
     getProductionCompanies,
     getProductionCompanyById,
-    createProductionCompany,
     updateProductionCompany,
     deleteProductionCompany,
 }

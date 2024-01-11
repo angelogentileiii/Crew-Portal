@@ -9,31 +9,19 @@ export const AuthProvider = ({ children, navigation }) => {
     const [isLoggedIn, setIsLoggedIn] = useState(false)
     const [currentUser, setCurrentUser] = useState({})
 
-    // using just for logs on load (maybe keep to check if user stayed logged in??)
-    // I can just pull from SecureStore throughout though
-    // useEffect(() => {
-    //     SecureStore.getItemAsync('accessToken')
-    //         .then(data => {
-    //             // setAccessToken(data)
-    //             console.log('Stored AToken: ', data)
-    //         })
-    //         .catch((error) => console.error('Error storing token:', error));
-    //     SecureStore.getItemAsync('refreshToken')
-    //         .then(data => {
-    //             // setRefreshToken(data)
-    //             console.log('Stored RToken: ', data)
-    //         })
-    //         .catch((error) => console.error('Error storing token:', error));
-    // }, [])
-
     // home IP: 'http://192.168.1.156:5555/users'
     // flatiron IP: 'http://10.129.3.82:5555/users'
 
     ////////////////////////////////////////
     // signup post request
-    const attemptSignup = async (userInfo) => {
+    const attemptSignup = async (userInfo, type) => {
+        const endpoint = type === 'crew' ? '/auth/signupUser' : '/auth/signupPC';
+        
+        console.log(type)
+
         try {
-            const response = await fetch('http://192.168.1.156:5555/auth/signup', {
+            const response = await fetch(`http://192.168.1.156:5555${endpoint}`, {
+            // const response = await fetch(`http://10.129.3.82:5555${endpoint}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -41,12 +29,17 @@ export const AuthProvider = ({ children, navigation }) => {
                 body: JSON.stringify(userInfo),
             });
             const returnedData = await response.json();
+            console.log('WITHIN SIGNUP ATTEMPT', returnedData)
+
             if (response.ok) {
-                console.log(returnedData.data.accessToken)
+                console.log(returnedData?.data.accessToken)
                 SecureStore.setItemAsync('accessToken', returnedData.data.accessToken.toString())
                 SecureStore.setItemAsync('refreshToken', returnedData.data.refreshToken.toString())
+
+                setIsLoggedIn(true)
+
             } else {
-                console.error('Registration error:', data.error);
+                console.error('Auth Context - Registration error:', data.error);
             }
         } catch (error) {
             console.error('Registration error:', error);
@@ -58,33 +51,39 @@ export const AuthProvider = ({ children, navigation }) => {
     // flatiron IP: 'http://10.129.3.82:5555/users/login'
 
     // login function which returns my two tokens
-    const attemptLogin = async (userInfo) => {
+    const attemptLogin = async (userInfo, type) => {
+        const endpoint = type === 'crew' ? '/auth/loginUser' : '/auth/loginPC';
+        console.log('WITHIN LOGIN ENDPOINT: ', endpoint)
+        console.log(`http://192.168.1.156:5555${endpoint}`)
+
         try {
-            const response = await fetch( 'http://192.168.1.156:5555/auth/login', {
+            const response = await fetch( `http://192.168.1.156:5555${endpoint}`, {
+            // const response = await fetch( `http://10.129.3.82:5555${endpoint}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(userInfo),
             });
+            
+            console.log(response.ok)
+
             if (!response.ok) {
                 const errorData = await response.json(); // Parse error response
-                console.error('Login error:', errorData.error);
-                throw new Error(errorData.error); // Throw an error for failed login
+                console.error('Login error:', errorData);
             }
             const returnedData = await response.json();
 
             await SecureStore.setItemAsync('accessToken', returnedData.data.accessToken.toString())
             await SecureStore.setItemAsync('refreshToken', returnedData.data.refreshToken.toString())
+
+            console.log('ATOKEN LOGIN FUNCTION:', await SecureStore.getItemAsync('accessToken'))
             
-            console.log('Within Attempt Login:')
             setIsLoggedIn(true)
-            console.log('After true Setter: ', isLoggedIn)
 
         } catch (error) {
-            console.error('Login error:', error.message);
-            throw new Error(error.message)
-        }
+            console.error('Login error:', error);
+        }  
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -116,6 +115,7 @@ export const AuthProvider = ({ children, navigation }) => {
             if (token) {
                 try {
                     const response = await fetch(`http://192.168.1.156:5555/accessToken`, {
+                    // const response = await fetch(`http://10.129.3.82:5555/accessToken`, {
                         method: 'GET',
                         headers: {
                             'Accept': 'application/json',
@@ -159,6 +159,7 @@ export const AuthProvider = ({ children, navigation }) => {
 
         try {
             const response = await fetch('http://192.168.1.156:5555/auth/refreshToken', {
+            // const response = await fetch('http://10.129.3.82:5555/auth/refreshToken', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

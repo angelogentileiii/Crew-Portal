@@ -8,6 +8,7 @@ const sequelize = require('./src/utils/db.js');
 const User = require('./src/models/users.js');
 const Production = require('./src/models/productions.js');
 const ProductionCompany = require('./src/models/productionCompanies.js');
+const CalendarEvent = require('./src/models/calendarEvents.js')
 
 // make the app/pull in env var
 const app = express();
@@ -18,9 +19,10 @@ const authRoutes = require('./src/routes/auth.js')
 const userRoutes = require('./src/routes/users.js');
 const productionRoutes = require('./src/routes/productions.js');
 const productionCompanyRoutes = require('./src/routes/productionCompanies.js');
+const calendarEventRoutes = require('./src/routes/calendarEvents.js')
 
 // imported middleware
-const checkJwtExpiration = require('./src/middlewareFuncs/checkTokenExpiry.js')
+// const checkJwtExpiration = require('./src/middlewareFuncs/checkTokenExpiry.js')
 const decodeJwtToken = require('./src/middlewareFuncs/decodeToken.js')
 
 // allows us to access the json info from requests
@@ -33,16 +35,12 @@ app.use((req, res, next) => {
     next()
 })
 
-/////// FIX THIS SHIT
-// app.use('/', decodeJwtToken)
-
-// app.use('/accessToken', decodeJwtToken)
-
 app.use('/auth', authRoutes)
 
 app.use('/users', decodeJwtToken, userRoutes )
 app.use('/productions', decodeJwtToken, productionRoutes )
-app.use('/productionCompanies', productionCompanyRoutes)
+app.use('/productionCompanies', decodeJwtToken, productionCompanyRoutes)
+app.use('/calendarEvents', decodeJwtToken, calendarEventRoutes)
 
 // app.use('/accessToken', decodeJwtToken)
 

@@ -29,6 +29,7 @@ function ProductionDetail ({ route, navigation }) {
     
             // Extract productionCompanyId from the responseJSON
             const productionCompanyId = responseJSON.productionCompanyId;
+            console.log(productionCompanyId)
     
             // Make the second fetch using productionCompanyId
             const pcResponse = await fetchAuthWrapper(`http://192.168.1.156:5555/productionCompanies/${productionCompanyId}`, {
@@ -58,9 +59,12 @@ function ProductionDetail ({ route, navigation }) {
                 <Text>{production.name}</Text>
                 <Text>{production.location}</Text>
                 <Text>{production.type}</Text>
-                <Text>{productionCompany.name}</Text>
-                <Text>{productionCompany.phoneNumber}</Text>
-                <Text>{productionCompany.email}</Text>
+                <View style={{paddingTop: '2%'}}>
+                    <Text>{productionCompany.companyName}</Text>
+                    <Text>{productionCompany.address}</Text>
+                    <Text>{productionCompany.phoneNumber}</Text>
+                    <Text>{productionCompany.email}</Text>
+                </View>
             </ScrollView>
         </View>
     )
