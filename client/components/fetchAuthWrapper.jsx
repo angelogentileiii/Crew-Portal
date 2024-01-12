@@ -36,6 +36,7 @@ const useFetchAuthWrapper = ({ navigation }) => {
                         // Retry the original request with the new access token
                         options.headers.Authorization = `Bearer ${refreshedToken}`;
                         const retryResponse = await fetch(url, options);
+                        console.log('RETRIED RESPONSE')
                         
                         if (!retryResponse.ok) {
                             throw new Error(`HTTP Error! Status: ${retryResponse.status}`);
@@ -54,12 +55,12 @@ const useFetchAuthWrapper = ({ navigation }) => {
             }
 
             if (!response.ok) {
-                throw new Error(`HTTP Error! Status: ${response.status}`);
+                console.log(`HTTP Error! Status: ${response.status}`);
             }
 
             return response.json();
         } catch (error) {
-            console.warn('Error Fetching 401 Auth:', error);
+            console.log('Error Fetching 401 Auth:', error);
         }
     };
 

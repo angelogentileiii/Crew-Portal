@@ -1,9 +1,8 @@
-import { StyleSheet, Text, View, Button, TextInput, TouchableOpacity, Vibration } from 'react-native';
+import React, { useEffect, useCallback, useContext, useState } from 'react';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Vibration } from 'react-native';
 import { useForm } from 'react-hook-form'
-import { useEffect, useCallback, useContext, useState } from 'react';
 
 import { AuthContext } from '../contextProviders/AuthContext';
-import * as SecureStore from 'expo-secure-store'
 
 function Login({ navigation }) {
   const { register, handleSubmit, setValue } = useForm()
@@ -15,35 +14,29 @@ function Login({ navigation }) {
   // pull out login function
   const { attemptLogin } = authContext
 
-  // checks for token existence
-  SecureStore.getItemAsync('accessToken')
-    .then(data => {
-      console.log('AToken within Login: ', data)
-    })
+  // register values of form changes
+  const onFieldChange = useCallback((name) => (text) => {
+    setValue(name, text)
+  }, [])
 
   // sends the login information to db
   const onSubmit = (formData) => {
     try {
-      console.log('Before login post', formData);
-      console.log('Before login post', userType)
+      // console.log('Before login post', formData);
+      // console.log('Before login post', userType)
       attemptLogin(formData, userType);
     
       // Redirect to home
       navigation.navigate('HomeScreen')
 
       if (Platform.OS === 'ios' || Platform.OS === 'android') {
-        Vibration.vibrate(5); // Vibrate for 5ms!!
-    }
+        Vibration.vibrate(3); // Vibrate for 5ms!!
+      }
     } catch (error) {
-      console.error('Error occurred:', error);
+      console.warn('Error occured on Submit: ', error);
     }
 
   }
-
-  // register values of form changes
-  const onFieldChange = useCallback((name) => (text) => {
-    setValue(name, text)
-  }, [])
 
   useEffect(() => {
     register('username');
@@ -55,29 +48,31 @@ function Login({ navigation }) {
         <Text style={styles.title}>Login</Text>
         {/* Toggle for choosing user type */}
         <View style={styles.checkboxContainer}>
-                    <Text style={styles.checkboxLabel}>Account Type: </Text>
-                        <TouchableOpacity
-                            style={[styles.checkBox, userType === 'crew' ? styles.activeCheckBox : null]}
-                            onPress={() => setUserType('crew')}
-                        >
-                        </TouchableOpacity>
-                    <Text>Crew</Text>
-                        <TouchableOpacity
-                            style={[styles.checkBox, userType === 'productionCompany' ? styles.activeCheckBox : null]}
-                            onPress={() => setUserType('productionCompany')}
-                        >
-                        </TouchableOpacity>
-                    <Text>Production Company</Text>
-                </View>
+            <Text style={styles.checkboxLabel}>Account Type: </Text>
+                <TouchableOpacity
+                    style={[styles.checkBox, userType === 'crew' ? styles.activeCheckBox : null]}
+                    onPress={() => setUserType('crew')}
+                >
+                </TouchableOpacity>
+            <Text>Crew</Text>
+                <TouchableOpacity
+                    style={[styles.checkBox, userType === 'productionCompany' ? styles.activeCheckBox : null]}
+                    onPress={() => setUserType('productionCompany')}
+                >
+                </TouchableOpacity>
+            <Text>Production Company</Text>
+        </View>
         <TextInput
         style={styles.input}
         placeholder='Username'
+        placeholderTextColor='#000'
         autoCapitalize="none"
         onChangeText={onFieldChange('username')}
         />
         <TextInput
         style={styles.input}
         placeholder='Password'
+        placeholderTextColor='#000'
         autoCapitalize="none"
         onChangeText={onFieldChange('password')}
         // secureTextEntry={true} 

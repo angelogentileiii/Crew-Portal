@@ -1,12 +1,23 @@
 import React, { useState } from 'react';
-import { View, Text, Button } from 'react-native';
+import { View, Text, Button, TouchableOpacity } from 'react-native';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 
-function AvailabilitySelector ({ onStartDateSelected, onEndDateSelected }) {
-    const [isStartPickerVisible, setStartPickerVisible] = useState(false);
-    const [isEndPickerVisible, setEndPickerVisible] = useState(false);
-    const [selectedStartDate, setSelectedStartDate] = useState(null);
-    const [selectedEndDate, setSelectedEndDate] = useState(null);
+function AvailabilitySelector ({ 
+    onStartDateSelected, 
+    onEndDateSelected, 
+    selectedStartDate, 
+    setSelectedStartDate, 
+    selectedEndDate, 
+    setSelectedEndDate,
+    isStartPickerVisible,
+    setStartPickerVisible,
+    isEndPickerVisible,
+    setEndPickerVisible
+}) {
+    // const [isStartPickerVisible, setStartPickerVisible] = useState(false);
+    // const [isEndPickerVisible, setEndPickerVisible] = useState(false);
+    // const [selectedStartDate, setSelectedStartDate] = useState(null);
+    // const [selectedEndDate, setSelectedEndDate] = useState(null);
 
     const showStartPicker = () => {
         setStartPickerVisible(true);
@@ -47,8 +58,18 @@ function AvailabilitySelector ({ onStartDateSelected, onEndDateSelected }) {
     
     return (
         <>
-            <View>
-                <Button title="Start Date" onPress={showStartPicker} />
+            <View style={styles.container}>
+                <Text>Add New Event</Text>
+                <TouchableOpacity
+                    style={styles.dateTimePickerButton} // Apply your TouchableOpacity styles here
+                    onPress={showStartPicker}
+                >
+                    {(selectedStartDate) ? (
+                        <Text style={styles.dateTimePickerButtonText}>Selected Start: {formatDate(selectedStartDate).toString()}</Text>
+                    ) : (
+                        <Text style={styles.dateTimePickerButtonText}>Start Date</Text>
+                    )}
+                </TouchableOpacity>
                 <DateTimePickerModal
                     isVisible={isStartPickerVisible}
                     mode="date"
@@ -59,12 +80,18 @@ function AvailabilitySelector ({ onStartDateSelected, onEndDateSelected }) {
                     onConfirm={handleStartConfirm}
                     onCancel={hideStartPicker}
                 />
-                {selectedStartDate && (
-                    <Text>Selected Start Date: {formatDate(selectedStartDate).toString()}</Text>
-                )}
             </View>
             <View>
-                <Button title="End Date" onPress={showEndPicker} />
+                <TouchableOpacity
+                    style={styles.dateTimePickerButton} // Apply your TouchableOpacity styles here
+                    onPress={showEndPicker}
+                >
+                    {(selectedEndDate) ? (
+                        <Text style={styles.dateTimePickerButtonText}>Selected End: {formatDate(selectedEndDate).toString()}</Text>
+                    ) : (
+                        <Text style={styles.dateTimePickerButtonText}>End Date</Text>
+                    )}
+                </TouchableOpacity>
                 <DateTimePickerModal
                     isVisible={isEndPickerVisible}
                     mode="date"
@@ -74,13 +101,29 @@ function AvailabilitySelector ({ onStartDateSelected, onEndDateSelected }) {
                     onConfirm={handleEndConfirm}
                     onCancel={hideEndPicker}
                 />
-                {selectedEndDate && (
-                    <Text>Selected End Date: {formatDate(selectedEndDate).toString()}</Text>
-                )}
+                {/* {(selectedEndDate) ? <Text>Selected End Date: {formatDate(selectedEndDate).toString()}</Text> : null} */}
             </View>
         </>
     )
+}
 
+const styles = {
+    container: {
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    dateTimePickerButton: {
+        backgroundColor: '#2196F3', // Button background color
+        padding: 12,
+        borderRadius: 8, // Add rounded corners to match inputs
+        width: 250,
+        marginBottom: 20,
+    },
+    dateTimePickerButtonText: {
+        color: '#fff',
+        textAlign: 'center',
+        fontWeight: 'bold',
+    },
 }
 
 export default AvailabilitySelector

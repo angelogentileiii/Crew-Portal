@@ -174,7 +174,10 @@ const getCalendarEventsByUser = async (req, res, next) => {
         });
 
         if (!calendarEvents || calendarEvents.length === 0) {
-            return res.status(404).json('No events found');
+            return res.status(200).json({
+                success: true, 
+                data: 'No events found'
+            });
         }
 
         const plainCalendarEvents = calendarEvents.map((event) => event.get({ plain: true }));

@@ -27,13 +27,9 @@ function JobBoard({ navigation }){
                 // const responseJSON = await fetchAuthWrapper('http://192.168.1.156:5555/productions', {
                 const responseJSON = await fetchAuthWrapper('http://10.129.3.82:5555/productions', {
                     method: 'GET',
-                    // headers: {
-                    //     'Accept': 'application/json',
-                    //     'Authorization': "Bearer " + token
-                    // }
                 });
 
-                console.log('AFTER PRODUCTIONS FETCH: ', responseJSON)
+                // console.log('AFTER PRODUCTIONS FETCH: ', responseJSON)
                 setProductions(responseJSON);
             } catch (error) {
                 console.error('Error occurred while fetching:', error);
@@ -113,7 +109,8 @@ const styles = StyleSheet.create({
         padding: 12,
         borderRadius: 8, // Add rounded corners to match inputs
         width: 250,
-        marginBottom: 20,
+        marginBottom: '5%',
+        marginTop: '2.5%',
     },
     buttonText: {
         color: '#fff',

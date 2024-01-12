@@ -1,6 +1,4 @@
 import React, { useContext, useEffect, useState } from "react"
-import { Text } from 'react-native'
-import { NavigationContainer } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { AuthContext } from "../contextProviders/AuthContext"
 
@@ -8,9 +6,7 @@ import { AuthContext } from "../contextProviders/AuthContext"
 import Login from './Login';
 import JobBoard from './JobBoard';
 import SignUp from './SignUp';
-// import CrewProfile from "./CrewProfile";
 import ProductionDetails from "./ProductionDetails";
-// import Calendar from "./Calendar";
 
 // COMPONENTS
 import NavigationBar from "../components/NavigationBar"
@@ -38,27 +34,6 @@ function HomeScreen() {
 
         fetchHome();
     }, []);
-
-    
-    // return (
-    //     // <Stack.Navigator initialRouteName={isLoggedIn ? 'Calendar' : 'Login'}>
-    //     <Stack.Navigator>
-    //         {isLoggedIn ? (
-    //             <>
-    //                 <Stack.Screen name="Calendar" component={Calendar} />
-    //                 <Stack.Screen name="JobBoard" component={JobBoard} />
-    //                 <Stack.Screen name="CrewProfile" component={CrewProfile} />
-    //                 <Stack.Screen name="ProductionDetails" component={ProductionDetails} />
-    //             </>
-    //         ) : (
-    //             <>
-    //                 <Stack.Screen name="Login" component={Login} />
-    //                 <Stack.Screen name="SignUp" component={SignUp} />
-    //                 <Stack.Screen name="JobBoard" component={JobBoard} />
-    //             </>
-    //         )}
-    // </Stack.Navigator>
-    // )
 
     return (
         <Stack.Navigator>

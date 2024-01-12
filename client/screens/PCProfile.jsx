@@ -17,7 +17,6 @@ function CrewProfile ({ navigation }) {
 
     useEffect(() => {
         const fetchData = async () => {
-            let token = await SecureStore.getItemAsync('accessToken')
             let user = await checkAccessToken()
             console.log('Check Access:', user)
 

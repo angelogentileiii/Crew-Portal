@@ -29,10 +29,10 @@ export const AuthProvider = ({ children, navigation }) => {
                 body: JSON.stringify(userInfo),
             });
             const returnedData = await response.json();
-            console.log('WITHIN SIGNUP ATTEMPT', returnedData)
+            // console.log('WITHIN SIGNUP ATTEMPT', returnedData)
 
             if (response.ok) {
-                console.log(returnedData?.data.accessToken)
+                // console.log(returnedData?.data.accessToken)
                 SecureStore.setItemAsync('accessToken', returnedData.data.accessToken.toString())
                 SecureStore.setItemAsync('refreshToken', returnedData.data.refreshToken.toString())
 
@@ -70,7 +70,7 @@ export const AuthProvider = ({ children, navigation }) => {
                 console.error('Login error:', errorData);
             }
 
-            console.log('RESPONSE OK:', response.ok)
+            // console.log('RESPONSE OK:', response.ok)
             
             const returnedData = await response.json();
             console.log('LOGIN RESPONSE AFTER:', returnedData)
@@ -113,7 +113,7 @@ export const AuthProvider = ({ children, navigation }) => {
     const checkAccessToken = async () => { 
         try {
             const token = await SecureStore.getItemAsync('accessToken')
-            console.log('Within CheckAccess: ', token)
+            console.log('WITHIIN CHECK ACCESS: ', token)
             if (token) {
                 try {
                     // const response = await fetch(`http://192.168.1.156:5555/accessToken`, {
@@ -157,7 +157,7 @@ export const AuthProvider = ({ children, navigation }) => {
             return null; // No refresh token available
         }
 
-        console.log("REFRESHING TOKENS CHECK!")
+        // console.log("REFRESHING TOKENS CHECK!")
 
         try {
             // const response = await fetch('http://192.168.1.156:5555/auth/refreshToken', {
