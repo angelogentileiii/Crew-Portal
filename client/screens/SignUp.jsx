@@ -1,13 +1,13 @@
 import React, { useState, useContext, useEffect, useCallback } from 'react'
 import { StyleSheet, Text, View, TouchableOpacity, TextInput, ScrollView, Platform, Vibration } from 'react-native';
 import { useForm } from 'react-hook-form'
-import { MultipleSelectList, SelectList } from 'react-native-dropdown-select-list'
+import { SelectList } from 'react-native-dropdown-select-list'
 
 import { AuthContext } from '../contextProviders/AuthContext';
 
 function SignUp ({ navigation }) {
     const [isUnionMember, setIsUnionMember] = useState(false);
-    const [selectedUnionNumber, setSelectedUnionNumber] = useState([]); // for selecting your union number
+    const [selectedUnionNumber, setSelectedUnionNumber] = useState([]);
     const [streetAddress, setStreetAddress] = useState('');
     const [cityState, setCityState] = useState('');
     const [zipCode, setZipCode] = useState('');
@@ -67,11 +67,11 @@ function SignUp ({ navigation }) {
     }, [register])
 
     const onSubmit = (formData) => {
-        console.log(formData)
+        // console.log(formData)
         attemptSignup(formData, userType)
 
         if (Platform.OS === 'ios' || Platform.OS === 'android') {
-            Vibration.vibrate(5); // Vibrate for 5ms!!
+            Vibration.vibrate(3); // Vibrate for 5ms!!
         }
 
         navigation.navigate('HomeScreen')
@@ -103,54 +103,63 @@ function SignUp ({ navigation }) {
                     <TextInput
                         style={styles.input}
                         placeholder='First Name'
+                        placeholderTextColor='#000'
                         autoCapitalize='none'
                         onChangeText={onFieldChange('firstName')}
                     />
                     <TextInput
                         style={styles.input}
                         placeholder='Last Name'
+                        placeholderTextColor='#000'
                         autoCapitalize='none'
                         onChangeText={onFieldChange('lastName')}
                     />
                     <TextInput
                         style={styles.input}
                         placeholder='Street Address'
+                        placeholderTextColor='#000'
                         autoCapitalize='none'
                         onChangeText={onFieldChange('streetAddress')}
                     />
                     <TextInput
                         style={styles.input}
                         placeholder='City/State'
+                        placeholderTextColor='#000'
                         autoCapitalize='none'
                         onChangeText={onFieldChange('cityState')}
                     />
                     <TextInput
                         style={styles.input}
                         placeholder='Zip Code'
+                        placeholderTextColor='#000'
                         autoCapitalize='none'
                         onChangeText={onFieldChange('zipCode')}
                     />
                     <TextInput
                         style={styles.input}
                         placeholder='Email Address'
+                        placeholderTextColor='#000'
                         autoCapitalize='none'
                         onChangeText={onFieldChange('email')}
                     />
                     <TextInput
                         style={styles.input}
                         placeholder='Phone Number'
+                        placeholderTextColor='#000'
                         autoCapitalize='none'
                         onChangeText={onFieldChange('phoneNumber')}
                     />
                     <TextInput
                         style={styles.input}
                         placeholder='Username'
+                        placeholderTextColor='#000'
                         autoCapitalize='none'
                         onChangeText={onFieldChange('username')}
                     />
                     <TextInput
                         style={styles.input}
                         placeholder='Password'
+                        placeholderTextColor='#000'
                         autoCapitalize='none'
                         onChangeText={onFieldChange('password')}
                     />
@@ -170,6 +179,7 @@ function SignUp ({ navigation }) {
                                 inputStyles={{borderColor: '#ccc'}}
                                 label='Unions:'
                                 placeholder='Select Union Number'
+                                placeholderTextColor='#000'
                                 setSelected={(val) => setSelectedUnionNumber(val)}
                                 data={unionNumbers}
                                 onSelect={() => {
@@ -186,50 +196,58 @@ function SignUp ({ navigation }) {
                 ) : (
                 <>
                     <TextInput
-                    style={styles.input}
-                    placeholder='Company Name'
-                    autoCapitalize='none'
-                    onChangeText={onFieldChange('companyName')}
+                        style={styles.input}
+                        placeholder='Company Name'
+                        placeholderTextColor='#000'
+                        autoCapitalize='none'
+                        onChangeText={onFieldChange('companyName')}
                     />
                     <TextInput
-                    style={styles.input}
-                    placeholder='Street Address'
-                    autoCapitalize='none'
-                    onChangeText={onFieldChange('streetAddress')}
+                        style={styles.input}
+                        placeholder='Street Address'
+                        placeholderTextColor='#000'
+                        autoCapitalize='none'
+                        onChangeText={onFieldChange('streetAddress')}
                     />
                     <TextInput
                         style={styles.input}
                         placeholder='City/State'
+                        placeholderTextColor='#000'
                         autoCapitalize='none'
                         onChangeText={onFieldChange('cityState')}
                     />
                     <TextInput
                         style={styles.input}
                         placeholder='Zip Code'
+                        placeholderTextColor='#000'
                         autoCapitalize='none'
                         onChangeText={onFieldChange('zipCode')}
                     />
                     <TextInput
                         style={styles.input}
                         placeholder='Email Address'
+                        placeholderTextColor='#000'
                         autoCapitalize='none'
                         onChangeText={onFieldChange('email')}
                     />
                     <TextInput
                         style={styles.input}
                         placeholder='Phone Number'
+                        placeholderTextColor='#000'
                         autoCapitalize='none'
                         onChangeText={onFieldChange('phoneNumber')}
                     />
                     <TextInput
                         style={styles.input}
                         placeholder='Username'
+                        placeholderTextColor='#000'
                         autoCapitalize='none'
                         onChangeText={onFieldChange('username')}
                     />
                     <TextInput
                         style={styles.input}
                         placeholder='Password'
+                        placeholderTextColor='#000'
                         autoCapitalize='none'
                         onChangeText={onFieldChange('password')}
                     />
@@ -251,11 +269,12 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        margin: 10,
+        backgroundColor: '#fff',
     },
     form: {
         width: '100%',
         flex: 1,
+        padding: 10,
     },
     formContent: {
         flexGrow: 1,

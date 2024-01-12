@@ -1,8 +1,6 @@
 import React, {useEffect, useState, useContext} from 'react';
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 
-import * as SecureStore from 'expo-secure-store'
-
 import { AuthContext } from '../contextProviders/AuthContext';
 import useFetchAuthWrapper from '../components/fetchAuthWrapper';
 
@@ -12,14 +10,11 @@ function CrewProfile ({ navigation }) {
 
     const authContext = useContext(AuthContext)
     const { attemptLogout, checkAccessToken } = authContext
-    
-    // console.log('Within Profile: ', currentUser.data?.username)
 
     const fetchAuthWrapper = useFetchAuthWrapper({ navigation });
 
     useEffect(() => {
         const fetchData = async () => {
-            let token = await SecureStore.getItemAsync('accessToken')
             let user = await checkAccessToken()
             console.log('Check Access:', user)
 
@@ -27,10 +22,6 @@ function CrewProfile ({ navigation }) {
                 // const responseJSON = await fetchAuthWrapper('http://192.168.1.156:5555/users/currentUser', {
                 const responseJSON = await fetchAuthWrapper(`http://10.129.3.82:5555/users/currentUser/`, {
                     method: 'GET',
-                    // headers: {
-                    //     'Accept': 'application/json',
-                    //     'Authorization': "Bearer " + token
-                    // }
                 })
 
                 setUserData(responseJSON)

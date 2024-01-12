@@ -14,6 +14,8 @@ import { AuthContext } from '../contextProviders/AuthContext';
 function Calendar({ navigation }) {
     const [selectedStartDate, setSelectedStartDate] = useState(null);
     const [selectedEndDate, setSelectedEndDate] = useState(null);
+    const [isStartPickerVisible, setStartPickerVisible] = useState(false);
+    const [isEndPickerVisible, setEndPickerVisible] = useState(false);
     const [dbEvents, setDBEvents] = useState([])
 
     const fetchAuthWrapper = useFetchAuthWrapper({ navigation });
@@ -33,25 +35,30 @@ function Calendar({ navigation }) {
     } = useCalendar('Crew Portal', '#5351e0', 'Crew Calendar');
 
     const fetchCalEvents = async () => {
-        const endpoint = currentUserType === 'crew' ? '/user/current' : '/pc/current';
+        const endpoint = await currentUserType === 'crew' ? '/user/current' : '/pc/current';
 
         try {
             let token = await SecureStore.getItemAsync('accessToken')
-            console.log('WITHIN USEEFFECT:', token)
+            // console.log('WITHIN USEEFFECT:', token)
 
             const responseJSON = await fetchAuthWrapper(`http://10.129.3.82:5555/calendarEvents${endpoint}`, {
                 method: 'GET',
-                headers: {
-                    'Accept': 'application/json',
-                    'Authorization': "Bearer " + token
-                }
+                // headers: {
+                //     'Accept': 'application/json',
+                //     'Authorization': "Bearer " + token
+                // }
             })
 
-            console.log('AFTER CAL EVENTS FETCH: ', responseJSON)
-            setDBEvents(responseJSON)
+            if (responseJSON) {
+                // console.log('AFTER CAL EVENTS FETCH: ', responseJSON)
+                setDBEvents(responseJSON)
 
-            const events = await getEvents()
-            console.log('GET EVENTS FUNCTION', events)
+                const events = await getEvents()
+                // console.log('GET EVENTS FUNCTION', events)
+            } else {
+                setDBEvents([])
+            }
+            
         } catch (error) {
             console.error('Error occurred while fetching:', error);
         }
@@ -96,9 +103,8 @@ function Calendar({ navigation }) {
         if (selectedStartDate && selectedEndDate) {
             try {
                 let token = await SecureStore.getItemAsync('accessToken')
-                console.log('TOKEN WITHIN SUBMIT:', token)
+                // console.log('TOKEN WITHIN SUBMIT:', token)
 
-                // console.log('RESPONSE JSON POSTED CAL:', responseJSON.id)
                 // Event added successfully
                 const returnedId = await addEventsToCalendar(
                     'Unavailable To Work', 
@@ -106,22 +112,32 @@ function Calendar({ navigation }) {
                     selectedEndDate,
                     );
                 
-                     // Send the event data to your backend
-                await fetchAuthWrapper('http://10.129.3.82:5555/calendarEvents/', {
-                    method: 'POST',
-                    // headers: {
-                    //     'Content-Type': 'application/json',
-                    //     'Authorization': 'Bearer ' + token,
-                    // },
-                    body: JSON.stringify({
-                        startDate: selectedStartDate,
-                        endDate: selectedEndDate,
-                        eventName:'Unavailable to Work',
-                        nativeCalId: returnedId
-                    }),
-                });
+                if (returnedId) {
+                    try {
+                        // Send the event data to your backend
+                        await fetchAuthWrapper('http://10.129.3.82:5555/calendarEvents/', {
+                            method: 'POST',
+                            // headers: {
+                            //     'Content-Type': 'application/json',
+                            //     'Authorization': 'Bearer ' + token,
+                            // },
+                            body: JSON.stringify({
+                                startDate: selectedStartDate,
+                                endDate: selectedEndDate,
+                                eventName:'Unavailable to Work',
+                                nativeCalId: returnedId
+                            }),
+                        });
+                    }
+                    catch (error) {
+                        console.error('Error Creating New Event: ', error)
+                    }
+                } else {
+                    console.error('No unique ID created for Event.')
+                }
 
-                fetchCalEvents()
+                
+                fetchCalEvents();
 
             } catch (error) {
                 console.error('Error adding event:', error)
@@ -133,7 +149,7 @@ function Calendar({ navigation }) {
 
     const handleDeleteEvent = async (nativeId, id) => {
         try {
-            console.log('WITHIN HANDLE DELETE', id)
+            // console.log('WITHIN HANDLE DELETE', id)
             deleteEventsById(nativeId, 'Crew Calendar')
             await fetchAuthWrapper(`http://10.129.3.82:5555/calendarEvents/${id}`, {
                 method: 'DELETE',
@@ -147,10 +163,10 @@ function Calendar({ navigation }) {
         }
     }
 
-    const removeCalendar = () => {
-        setDBEvents([])
-        deleteCalendar();
-    }
+    // const removeCalendar = () => {
+    //     setDBEvents([])
+    //     deleteCalendar();
+    // }
 
     return (
         <>
@@ -158,23 +174,29 @@ function Calendar({ navigation }) {
                 <AvailabilitySelector
                     onStartDateSelected={handleStartConfirm}
                     onEndDateSelected={handleEndConfirm}
+                    selectedEndDate={selectedEndDate}
+                    setSelectedEndDate={setSelectedEndDate}
+                    selectedStartDate={selectedStartDate}
+                    setSelectedStartDate={setSelectedStartDate}
+                    isStartPickerVisible={isStartPickerVisible}
+                    setStartPickerVisible={setStartPickerVisible}
+                    isEndPickerVisible={isEndPickerVisible}
+                    setEndPickerVisible={setEndPickerVisible}
                 />
-                <TouchableOpacity
+                {(selectedStartDate && selectedEndDate) ? (<TouchableOpacity
                     style={styles.button}
                     underlayColor="#1E88E5" // Color when pressed
                     onPress={() => {
                         handleEventSubmit()
-                        // navigate.navigate('Login')
+                        setSelectedStartDate(null)
+                        setSelectedEndDate(null)
                     }}
                 >
                     <Text style={styles.buttonText}>Add Event</Text>
                 </TouchableOpacity>
-                {/* {events.map((event) => {
-                    event.map((e) => {
-                        console.log('within Double Map Business:', e['startDate'])
-                    })
-                })} */}
-                <TouchableOpacity
+                ) : null }
+
+                {/* <TouchableOpacity
                     style={styles.button}
                     underlayColor="#1E88E5" // Color when pressed
                     onPress={() => {
@@ -183,8 +205,9 @@ function Calendar({ navigation }) {
                     }}
                 >
                     <Text style={styles.buttonText}>Remove Calendar</Text>
-                </TouchableOpacity>
-                {dbEvents ? dbEvents.map((event, index) => {
+                </TouchableOpacity> */}
+
+                {(dbEvents.length > 0) ? dbEvents.map((event, index) => {
                     return (
                         <View key={index}>
                             <Text>Calendar Event #{index + 1}</Text>

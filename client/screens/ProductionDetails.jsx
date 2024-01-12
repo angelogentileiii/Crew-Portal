@@ -10,29 +10,38 @@ function ProductionDetail ({ route, navigation }) {
 
     const fetchAuthWrapper = useFetchAuthWrapper({ navigation });
 
-    console.log( id )
-
     const fetchProductionData = async () => {
         try {
             // const responseJSON = await fetchAuthWrapper(`http://192.168.1.156:5555/productions/${id}`, {
             const responseJSON = await fetchAuthWrapper(`http://10.129.3.82:5555/productions/${id}`, {
                 method: 'GET',
             });
-            setProduction(responseJSON);
+
+            // console.log('AFTER PRODUCTIONS FETCH: ', responseJSON)
+
+            if (responseJSON) {
+                try{
+                    setProduction(responseJSON);
     
-            // Extract productionCompanyId from the responseJSON
-            const productionCompanyId = responseJSON.productionCompanyId;
-            console.log(productionCompanyId)
-    
-            // Make the second fetch using productionCompanyId
-            // const pcResponse = await fetchAuthWrapper(`http://192.168.1.156:5555/productionCompanies/${productionCompanyId}`, {
-            const pcResponse = await fetchAuthWrapper(`http://10.129.3.82:5555/productionCompanies/${productionCompanyId}`, {
-                method: 'GET',
-            });
-            
-            // await production company data and set it
-            const pcData = await pcResponse;
-            setProductionCompany(pcData);
+                // Extract productionCompanyId from the responseJSON
+                const productionCompanyId = responseJSON.productionCompanyId;
+        
+                // Make the second fetch using productionCompanyId
+                // const pcResponse = await fetchAuthWrapper(`http://192.168.1.156:5555/productionCompanies/${productionCompanyId}`, {
+                const pcResponse = await fetchAuthWrapper(`http://10.129.3.82:5555/productionCompanies/${productionCompanyId}`, {
+                    method: 'GET',
+                });
+
+                // console.log('AFTER PRODUCTIONS PC FETCH: ', pcResponse)
+                
+                // await production company data and set it
+                const pcData = pcResponse;
+                setProductionCompany(pcData);
+                }
+                catch (error) {
+                    console.error('Error Fetchin Production Company: ', error)
+                }
+            }  
         } catch (error) {
             console.error('Error Fetching Production: ', error);
         }

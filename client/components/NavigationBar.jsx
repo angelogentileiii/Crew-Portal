@@ -5,6 +5,7 @@ import JobBoard from '../screens/JobBoard';
 import Calendar from '../screens/Calendar';
 import CrewProfile from '../screens/CrewProfile';
 import PCProfile from '../screens/PCProfile';
+import AddProduction from '../screens/AddProduction';
 
 import { AuthContext } from "../contextProviders/AuthContext";
 
@@ -18,15 +19,17 @@ function NavigationBar () {
         <Tab.Navigator initialRouteName="JobBoard" screenOptions={{ tabBarVisible: isLoggedIn }}>
             {(currentUserType === 'crew') ? (
                     <>
-                        <Tab.Screen name="JobBoard" component={JobBoard}  />
-                        <Tab.Screen name="Calendar" component={Calendar} />
-                        <Tab.Screen name="CrewProfile" component={CrewProfile} />
+                        <Tab.Screen name="All Productions" component={JobBoard}  />
+                        <Tab.Screen name="My Calendar" component={Calendar} />
+                        <Tab.Screen name="Crew Profile" component={CrewProfile} />
+                        <Tab.Screen name="Add Production" component={AddProduction} />
                     </>
                 ):(
                     <>
-                        <Tab.Screen name="JobBoard" component={JobBoard}  />
-                        <Tab.Screen name="Calendar" component={Calendar} />
-                        <Tab.Screen name="Profile" component={PCProfile} />
+                        <Tab.Screen name="All Productions" component={JobBoard}  />
+                        <Tab.Screen name="My Calendar" component={Calendar} />
+                        <Tab.Screen name="Company Profile" component={PCProfile} />
+                        <Tab.Screen name="Add Production" component={AddProduction} />
                     </>
                 )
             }
