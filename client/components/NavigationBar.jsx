@@ -2,11 +2,11 @@ import React, {useContext} from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import JobBoard from '../screens/JobBoard';
-import Calendar from '../screens/Calendar';
+
 import CrewProfile from '../screens/CrewProfile';
 import PCProfile from '../screens/PCProfile';
 import AddProduction from '../screens/AddProduction';
-
+import EventCalendar from '../screens/EventCalendar';
 import { AuthContext } from "../contextProviders/AuthContext";
 
 const Tab = createBottomTabNavigator();
@@ -20,9 +20,9 @@ function NavigationBar () {
             {(currentUserType === 'crew') ? (
                     <>
                         <Tab.Screen name="All Productions" component={JobBoard}  />
-                        <Tab.Screen name="My Calendar" component={Calendar} />
+                        <Tab.Screen name="My Calendar" component={EventCalendar} />
                         <Tab.Screen name="Crew Profile" component={CrewProfile} />
-                        <Tab.Screen name="Add Production" component={AddProduction} />
+                        {/* <Tab.Screen name="Add Production" component={AddProduction} /> */}
                     </>
                 ):(
                     <>

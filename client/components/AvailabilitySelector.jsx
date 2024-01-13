@@ -59,7 +59,7 @@ function AvailabilitySelector ({
     return (
         <>
             <View style={styles.container}>
-                <Text>Add New Event</Text>
+                <Text style={styles.title}>Add New Event</Text>
                 <TouchableOpacity
                     style={styles.dateTimePickerButton} // Apply your TouchableOpacity styles here
                     onPress={showStartPicker}
@@ -111,6 +111,10 @@ const styles = {
     container: {
         alignItems: 'center',
         justifyContent: 'center',
+    },
+    title: {
+        fontSize: 18,
+        margin: 20,
     },
     dateTimePickerButton: {
         backgroundColor: '#2196F3', // Button background color

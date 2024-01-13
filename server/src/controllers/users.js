@@ -123,7 +123,7 @@ const currentUser = async (req, res, next) => {
                 username: username,
                 email: email
             },
-            attributes: {exclude: ['createdAt', 'updatedAt', 'id', 'password']}
+            attributes: {exclude: ['createdAt', 'updatedAt', 'password']}
         })
 
         const plainUser = currentUser.get({ plain: true });

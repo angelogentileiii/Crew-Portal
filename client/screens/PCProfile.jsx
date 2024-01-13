@@ -1,8 +1,6 @@
 import React, {useEffect, useState, useContext} from 'react';
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 
-import * as SecureStore from 'expo-secure-store'
-
 import { AuthContext } from '../contextProviders/AuthContext';
 import useFetchAuthWrapper from '../components/fetchAuthWrapper';
 
@@ -21,8 +19,8 @@ function CrewProfile ({ navigation }) {
             console.log('Check Access:', user)
 
             try {
-                // const responseJSON = await fetchAuthWrapper('http://192.168.1.156:5555/users/currentUser', {
-                const responseJSON = await fetchAuthWrapper(`http://10.129.3.82:5555/productionCompanies/currentUser`, {
+                const responseJSON = await fetchAuthWrapper('http://192.168.1.156:5555/productionCompanies/currentUser', {
+                // const responseJSON = await fetchAuthWrapper(`http://10.129.3.82:5555/productionCompanies/currentUser`, {
                     method: 'GET',
                 })
 
