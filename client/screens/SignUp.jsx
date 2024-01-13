@@ -67,7 +67,7 @@ function SignUp ({ navigation }) {
     }, [register])
 
     const onSubmit = (formData) => {
-        // console.log(formData)
+        console.log(formData)
         attemptSignup(formData, userType)
 
         if (Platform.OS === 'ios' || Platform.OS === 'android') {

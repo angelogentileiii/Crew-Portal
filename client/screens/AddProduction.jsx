@@ -1,20 +1,26 @@
 import React, { useEffect, useCallback, useContext, useState } from 'react';
-import { StyleSheet, Text, ScrollView, View, TextInput, TouchableOpacity, Vibration } from 'react-native';
+import { StyleSheet, Text, ScrollView, View, TextInput, TouchableOpacity, Vibration, Platform } from 'react-native';
 import { useForm } from 'react-hook-form'
 import { SelectList } from 'react-native-dropdown-select-list'
 
 import { AuthContext } from '../contextProviders/AuthContext';
+import useFetchAuthWrapper from '../components/fetchAuthWrapper';
 
 function AddProduction ({ navigation }) {
-    const { register, handleSubmit, setValue } = useForm();
+    const { register, handleSubmit, setValue, getValues } = useForm();
     const [isUnionProd, setIsUnionProd] = useState(false);
     const [selectedProdType, setSelectedProdType] = useState(null);
     const [selectedProdFormat, setSelectedProdFormat] = useState(null);
-    const [selectedCity, setSelectedCity] = useState(null)
-    const [selectedState, setSelectedState] = useState(null)
+    const [selectedCity, setSelectedCity] = useState('')
+    const [selectedState, setSelectedState] = useState('')
+    const [location, setLocation] = useState('')
 
     const authContext = useContext(AuthContext)
-    const { currentUserType } = authContext
+    const { getCurrentUser, currentUser } = authContext
+
+    const fetchAuthWrapper = useFetchAuthWrapper({ navigation });
+
+    console.log('WITHIN ADD PRODUCTION: ', currentUser)
 
     const productionTypes = [
         { value: 'Commercial', key: 'Commercial' },
@@ -22,61 +28,104 @@ function AddProduction ({ navigation }) {
         { value: 'Film', key: 'Film' },
         { value: 'Reality', key: 'Reality'},
         { value: 'Short', key: 'Short' },
-        { value: 'Social Media', key: 'SocialMedia' },
+        { value: 'Social Media', key: 'Social Media' },
         { value: 'Television', key: 'Television' },
         // Add more union numbers as needed
     ];
 
     const productionFormats = {
-            Commercial: [
+            'Commercial': [
                 { value: 'Campaign', key: 'Campaign' },
                 { value: 'Spec/Proof of Concept', key: 'Spec/Proof of Concept' },
             ],
-            Documentary: [
+            'Documentary': [
                 { value: 'Feature Length', key: 'Feature' },
                 { value: 'Limited Series', key: 'Limited Series' },
             ],
-            Film: [
+            'Film': [
                 { value: 'Feature', key: 'Feature' },
                 { value: 'Short', key: 'Short' },
             ],
-            Reality: [
+            'Reality': [
                 { value: 'Episode', key: 'Episode' },
                 { value: 'Series', key: 'Series' },
             ],
-            Short: [
+            'Short': [
                 { value: 'Documentary', key: 'Documentary' },
                 { value: 'Film', key: 'Film' },
             ],
-            SocialMedia: [
+            'Social Media': [
                 { value: 'Campaign', key: 'Campaign' },
                 { value: 'Promo', key: 'Promo' },
             ],
-            Television: [
+            'Television': [
                 { value: 'Pilot', key: 'Pilot' },
                 { value: 'Network Series', key: 'Series' },
                 { value: 'Streaming Series', key: 'Streaming Series'}
             ]
         }
 
-    const onFieldChange = useCallback((name) => (text) => {
+    const onFieldChange = useCallback((name) => async (text) => {
         if (name === 'city') {
+            // setValue('location', `${text}, ${getValues('state') || ''}`);
             setSelectedCity(text)
+            // setLocation(`${text}, ${selectedState || ''}`);
         } else if (name === 'state') {
+            // setValue('location', `${getValues('city') || ''}, ${text}`);
             setSelectedState(text)
+            // setLocation(`${selectedCity || ''}, ${text}`);
+        } else {
+            setValue(name, text)
         }
 
         let location = `${selectedCity}, ${selectedState}`
+        setValue('location', location)
 
-    }, [selectedCity, selectedState, ])
+        console.log('WITHIN FIELD CHANGE', name, text)
 
-    const onSubmit = (formData) => {
+    }, [setValue, selectedCity, selectedState])
+
+    useEffect(() => {
+        setValue('type', `${selectedProdFormat} ${selectedProdType}` );
+        setValue('unionProduction', isUnionProd)
+        setValue('location', `${selectedCity}, ${selectedState}`);
+    }, [selectedProdFormat, selectedProdType, selectedCity, selectedState, setValue]);
+
+    const addProduction = async ( formData ) => {
         try {
-            console.log(formData)
+
+            console.log('FORM DATA BEFORE SUBMISSION:', formData);
+
+            const responseJSON = await fetchAuthWrapper('http://192.168.1.156:5555/productions', {
+            // await fetchAuthWrapper('http://10.129.3.82:5555/productions', {
+                method: 'POST',
+                body: JSON.stringify({
+                    ...formData,
+                    'productionCompanyId': currentUser.id
+                })
+            })
+            return await responseJSON
+        }
+        catch (error) {
+            console.log('WITIHN ADD PRODUCTION:', error)
+        }
+    }
+
+    const onSubmit = async (formData) => {
+        
+        try {
+            delete formData.city;
+            delete formData.state;
+
+            console.log('WITHIN ON SUBMIT', formData)
 
             if (Platform.OS === 'ios' || Platform.OS === 'android') {
                 Vibration.vibrate(3); // Vibrate for 5ms!!
-            }            
+            }    
+            
+            await addProduction(formData)
+            
+            navigation.navigate('All Productions');
         }
         catch (error) {
             console.warn('Error occured on Submit: ', error)
@@ -89,10 +138,6 @@ function AddProduction ({ navigation }) {
         register('city');
         register('state');
     }, [register])
-
-    useEffect(() => {
-        setValue('type', `${selectedProdType} ${selectedProdFormat}`);
-    }, [selectedProdType, selectedProdFormat, setValue]);
 
     return (
         <View style={styles.container}>
@@ -173,10 +218,7 @@ function AddProduction ({ navigation }) {
             <TouchableOpacity
                 style={styles.button}
                 underlayColor="#1E88E5" // Color when pressed
-                onPress={() => {
-                    handleSubmit(onSubmit)
-                    // navigation.navigate('SignUp')
-                }}
+                onPress={handleSubmit(onSubmit)}
             >
                 <Text style={styles.buttonText}>Add To Job Board</Text>
             </TouchableOpacity>

@@ -8,6 +8,7 @@ export const AuthContext = createContext();
 export const AuthProvider = ({ children, navigation }) => {
     const [isLoggedIn, setIsLoggedIn] = useState(false)
     const [currentUserType, setCurrentUserType] = useState('crew')
+    const [currentUser, setCurrentUser] = useState({})
 
     // home IP: 'http://192.168.1.156:5555/users'
     // flatiron IP: 'http://10.129.3.82:5555/users'
@@ -17,11 +18,11 @@ export const AuthProvider = ({ children, navigation }) => {
     const attemptSignup = async (userInfo, type) => {
         const endpoint = type === 'crew' ? '/auth/signupUser' : '/auth/signupPC';
         
-        console.log(type)
+        console.log('FETCH URL', `http://192.168.1.156:5555${endpoint}`)
 
         try {
-            // const response = await fetch(`http://192.168.1.156:5555${endpoint}`, {
-            const response = await fetch(`http://10.129.3.82:5555${endpoint}`, {
+            const response = await fetch(`http://192.168.1.156:5555${endpoint}`, {
+            // const response = await fetch(`http://10.129.3.82:5555${endpoint}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -29,7 +30,7 @@ export const AuthProvider = ({ children, navigation }) => {
                 body: JSON.stringify(userInfo),
             });
             const returnedData = await response.json();
-            // console.log('WITHIN SIGNUP ATTEMPT', returnedData)
+            console.log('WITHIN SIGNUP ATTEMPT', returnedData)
 
             if (response.ok) {
                 // console.log(returnedData?.data.accessToken)
@@ -37,6 +38,7 @@ export const AuthProvider = ({ children, navigation }) => {
                 SecureStore.setItemAsync('refreshToken', returnedData.data.refreshToken.toString())
 
                 setIsLoggedIn(true)
+                getCurrentUser(type)
                 setCurrentUserType(type)
 
             } else {
@@ -56,8 +58,8 @@ export const AuthProvider = ({ children, navigation }) => {
         const endpoint = await type === 'crew' ? '/auth/loginUser' : '/auth/loginPC';
 
         try {
-            // const response = await fetch( `http://192.168.1.156:5555${endpoint}`, {
-            const response = await fetch( `http://10.129.3.82:5555${endpoint}`, {
+            const response = await fetch( `http://192.168.1.156:5555${endpoint}`, {
+            // const response = await fetch( `http://10.129.3.82:5555${endpoint}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -81,6 +83,7 @@ export const AuthProvider = ({ children, navigation }) => {
             console.log('ATOKEN LOGIN FUNCTION:', await SecureStore.getItemAsync('accessToken'))
             
             setIsLoggedIn(true)
+            getCurrentUser(type)
             setCurrentUserType(type)
 
         } catch (error) {
@@ -116,8 +119,8 @@ export const AuthProvider = ({ children, navigation }) => {
             console.log('WITHIIN CHECK ACCESS: ', token)
             if (token) {
                 try {
-                    // const response = await fetch(`http://192.168.1.156:5555/accessToken`, {
-                    const response = await fetch(`http://10.129.3.82:5555/auth/decodeToken`, {
+                    const response = await fetch(`http://192.168.1.156:5555/auth/decodeToken`, {
+                    // const response = await fetch(`http://10.129.3.82:5555/auth/decodeToken`, {
                         method: 'POST',
                         headers: {
                             'Accept': 'application/json',
@@ -160,8 +163,8 @@ export const AuthProvider = ({ children, navigation }) => {
         // console.log("REFRESHING TOKENS CHECK!")
 
         try {
-            // const response = await fetch('http://192.168.1.156:5555/auth/refreshToken', {
-            const response = await fetch('http://10.129.3.82:5555/auth/refreshToken', {
+            const response = await fetch('http://192.168.1.156:5555/auth/refreshToken', {
+            // const response = await fetch('http://10.129.3.82:5555/auth/refreshToken', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -183,11 +186,33 @@ export const AuthProvider = ({ children, navigation }) => {
         }
     };
     
-    // useEffect(() => {
-    //     checkAccessToken();
-    // }, [])
+    const getCurrentUser = async (type) => {
+        const endpoint = await type === 'crew' ? '/users/currentUser' : '/productionCompanies/currentUser';
+        const token = await SecureStore.getItemAsync('accessToken')
 
-    // checkAccessToken()
+        console.log('CURRENT USER ENDPOINT: ', `http://192.168.1.156:5555${endpoint}`)
+        console.log('CURRENT USER ATOKEN: ', token)
+
+        try {
+            const responseJSON = await fetch(`http://192.168.1.156:5555${endpoint}`, {
+            // const responseJSON = await fetchAuthWrapper(`http://10.129.3.82:5555${endpoint}`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Authorization': 'Bearer ' + token,
+                }
+            })
+
+            // console.log('AFTER CURRENT USER FETCH: ', await responseJSON.json())
+            const currentUser = await responseJSON.json()
+
+
+            setCurrentUser(currentUser)
+        }
+        catch (error) {
+            console.error('Error occurred while Fetching: ', error)
+        }
+    }
 
     const authContext = {
         attemptSignup,
@@ -196,6 +221,8 @@ export const AuthProvider = ({ children, navigation }) => {
         checkAccessToken,
         refreshTokens,
         setIsLoggedIn,
+        getCurrentUser,
+        currentUser,
         currentUserType,
         isLoggedIn,
     };
