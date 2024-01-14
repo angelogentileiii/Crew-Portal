@@ -5,19 +5,19 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 function AvailabilitySelector ({ 
     onStartDateSelected, 
     onEndDateSelected, 
-    selectedStartDate, 
-    setSelectedStartDate, 
-    selectedEndDate, 
-    setSelectedEndDate,
-    isStartPickerVisible,
-    setStartPickerVisible,
-    isEndPickerVisible,
-    setEndPickerVisible
+    // selectedStartDate, 
+    // setSelectedStartDate, 
+    // selectedEndDate, 
+    // setSelectedEndDate,
+    // isStartPickerVisible,
+    // setStartPickerVisible,
+    // isEndPickerVisible,
+    // setEndPickerVisible
 }) {
-    // const [isStartPickerVisible, setStartPickerVisible] = useState(false);
-    // const [isEndPickerVisible, setEndPickerVisible] = useState(false);
-    // const [selectedStartDate, setSelectedStartDate] = useState(null);
-    // const [selectedEndDate, setSelectedEndDate] = useState(null);
+    const [isStartPickerVisible, setStartPickerVisible] = useState(false);
+    const [isEndPickerVisible, setEndPickerVisible] = useState(false);
+    const [selectedStartDate, setSelectedStartDate] = useState(null);
+    const [selectedEndDate, setSelectedEndDate] = useState(null);
 
     const showStartPicker = () => {
         setStartPickerVisible(true);
@@ -59,15 +59,14 @@ function AvailabilitySelector ({
     return (
         <>
             <View style={styles.container}>
-                <Text style={styles.title}>Add New Event</Text>
                 <TouchableOpacity
-                    style={styles.dateTimePickerButton} // Apply your TouchableOpacity styles here
+                    style={styles.dateTimePickerButton}
                     onPress={showStartPicker}
                 >
                     {(selectedStartDate) ? (
-                        <Text style={styles.dateTimePickerButtonText}>Selected Start: {formatDate(selectedStartDate).toString()}</Text>
+                        <Text style={styles.dateTimePickerButtonText}>Start: {formatDate(selectedStartDate).toString()}</Text>
                     ) : (
-                        <Text style={styles.dateTimePickerButtonText}>Start Date</Text>
+                        <Text style={styles.dateTimePickerButtonText}>Choose Start Date</Text>
                     )}
                 </TouchableOpacity>
                 <DateTimePickerModal
@@ -83,13 +82,13 @@ function AvailabilitySelector ({
             </View>
             <View>
                 <TouchableOpacity
-                    style={styles.dateTimePickerButton} // Apply your TouchableOpacity styles here
+                    style={styles.dateTimePickerButton}
                     onPress={showEndPicker}
                 >
                     {(selectedEndDate) ? (
-                        <Text style={styles.dateTimePickerButtonText}>Selected End: {formatDate(selectedEndDate).toString()}</Text>
+                        <Text style={styles.dateTimePickerButtonText}>End: {formatDate(selectedEndDate).toString()}</Text>
                     ) : (
-                        <Text style={styles.dateTimePickerButtonText}>End Date</Text>
+                        <Text style={styles.dateTimePickerButtonText}>Choose End Date</Text>
                     )}
                 </TouchableOpacity>
                 <DateTimePickerModal
@@ -101,7 +100,6 @@ function AvailabilitySelector ({
                     onConfirm={handleEndConfirm}
                     onCancel={hideEndPicker}
                 />
-                {/* {(selectedEndDate) ? <Text>Selected End Date: {formatDate(selectedEndDate).toString()}</Text> : null} */}
             </View>
         </>
     )

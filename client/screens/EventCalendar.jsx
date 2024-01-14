@@ -5,7 +5,8 @@ import React, { useState, useEffect, useContext } from 'react';
 import { View, ScrollView, StyleSheet, TouchableOpacity, Text } from 'react-native';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
 
-import AvailabilitySelector from '../components/AvailabilitySelector';
+// import AvailabilitySelector from '../components/AvailabilitySelector';
+import AddEventModal from '../components/AddEventModal';
 import useCalendar from '../components/useCalendarHook';
 import useFetchAuthWrapper from '../components/fetchAuthWrapper';
 import { AuthContext } from '../contextProviders/AuthContext';
@@ -13,8 +14,9 @@ import { AuthContext } from '../contextProviders/AuthContext';
 function EventCalendar({ navigation }) {
     const [selectedStartDate, setSelectedStartDate] = useState(null);
     const [selectedEndDate, setSelectedEndDate] = useState(null);
-    const [isStartPickerVisible, setStartPickerVisible] = useState(false);
-    const [isEndPickerVisible, setEndPickerVisible] = useState(false);
+    // const [isStartPickerVisible, setStartPickerVisible] = useState(false);
+    // const [isEndPickerVisible, setEndPickerVisible] = useState(false);
+    const [isModalVisible, setModalVisible] = useState(false);
     const [dbEvents, setDBEvents] = useState([])
 
     const fetchAuthWrapper = useFetchAuthWrapper({ navigation });
@@ -90,22 +92,22 @@ function EventCalendar({ navigation }) {
         }
     }
 
-    const handleEventSubmit = async () => {
+    const handleEventSubmit = async ({ eventName, startDate, endDate }) => {
         const calendarId = await getCalendarId();
         if (!calendarId) {
             await createCalendar();
         }
 
-        if (selectedStartDate && selectedEndDate) {
+        if (startDate && endDate) {
             try {
                 // let token = await SecureStore.getItemAsync('accessToken')
                 // console.log('TOKEN WITHIN SUBMIT:', token)
 
                 // Event added successfully
                 const returnedId = await addEventsToCalendar(
-                    'Unavailable To Work', 
-                    selectedStartDate, 
-                    selectedEndDate,
+                    eventName, 
+                    startDate, 
+                    endDate,
                     );
                 
                 if (returnedId) {
@@ -119,10 +121,10 @@ function EventCalendar({ navigation }) {
                             //     'Authorization': 'Bearer ' + token,
                             // },
                             body: JSON.stringify({
-                                startDate: selectedStartDate,
-                                endDate: selectedEndDate,
-                                eventName:'Unavailable to Work',
-                                nativeCalId: returnedId
+                                startDate,
+                                endDate,
+                                eventName,
+                                nativeCalId: returnedId,
                             }),
                         });
                     }
@@ -210,48 +212,12 @@ function EventCalendar({ navigation }) {
                     }}
                 />
                 <ScrollView>
-                {/* Add Events */}
-                <AvailabilitySelector
-                    onStartDateSelected={handleStartConfirm}
-                    onEndDateSelected={handleEndConfirm}
-                    selectedEndDate={selectedEndDate}
-                    setSelectedEndDate={setSelectedEndDate}
-                    selectedStartDate={selectedStartDate}
-                    setSelectedStartDate={setSelectedStartDate}
-                    isStartPickerVisible={isStartPickerVisible}
-                    setStartPickerVisible={setStartPickerVisible}
-                    isEndPickerVisible={isEndPickerVisible}
-                    setEndPickerVisible={setEndPickerVisible}
-                />
-                {(selectedStartDate && selectedEndDate) ? (<TouchableOpacity
-                    style={styles.button}
-                    underlayColor="#1E88E5" // Color when pressed
-                    onPress={() => {
-                        handleEventSubmit()
-                        setSelectedStartDate(null)
-                        setSelectedEndDate(null)
-                    }}
-                >
-                    <Text style={styles.buttonText}>Add Event</Text>
-                </TouchableOpacity>
-                ) : null }
 
-                {/* <TouchableOpacity
-                    style={styles.button}
-                    underlayColor="#1E88E5" // Color when pressed
-                    onPress={() => {
-                        removeCalendar()
-                        // navigate.navigate('Login')
-                    }}
-                >
-                    <Text style={styles.buttonText}>Remove Calendar</Text>
-                </TouchableOpacity> */}
-
+                {/* User's Events */}
                 {(dbEvents.length > 0) ? dbEvents.map((event, index) => {
                     return (
                         <View key={index}>
-                            <Text>Calendar Event #{index + 1}</Text>
-                            <Text>ID: {event.id}</Text>
+                            <Text>{event.eventName}</Text>
                             <Text>Start: {event.startDate}</Text>
                             <Text>End: {event.endDate}</Text>
                             <TouchableOpacity
@@ -266,18 +232,21 @@ function EventCalendar({ navigation }) {
                         </View>
                     )
                 }): (null)}
-
-                {/* <TouchableOpacity
-                    style={styles.button}
-                    underlayColor="#1E88E5" // Color when pressed
-                    onPress={() => {
-                        attemptLogout()
-                        navigation.navigate('HomeScreen')
-                    }}
-                >
-                    <Text style={styles.buttonText}>Logout?</Text>
-                </TouchableOpacity> */}
             </ScrollView>
+
+            {/* Opens Date Selector Modal */}
+            <TouchableOpacity
+                    style={styles.addEventButton}
+                    underlayColor="#1E88E5"
+                    onPress={() => setModalVisible(true)}
+                >
+                    <Text style={styles.aeButtonText}>+</Text>
+                </TouchableOpacity>
+            <AddEventModal
+                isVisible={isModalVisible}
+                onClose={() => setModalVisible(false)}
+                handleEventSubmit={handleEventSubmit}
+            />
         </View>
     );
 }
@@ -290,27 +259,31 @@ const styles = StyleSheet.create({
         padding: 20,
         backgroundColor: '#fff',
     },
-    button: {
+    addEventButton: {
         backgroundColor: '#2196F3', // Button background color
-        padding: 12,
-        borderRadius: 8, // Add rounded corners to match inputs
-        width: 250,
-        marginBottom: 20,
+        borderRadius:500,
+        padding: '2%',
     },
-    calendar: {
-        width: '100%',
+    addEventButton: {
+        position: 'absolute',
+        bottom: 20,
+        right: 20,
+        backgroundColor: '#2196F3', // Button background color
+        borderRadius: 50, // Make it a circle
+        width: 50,
+        height: 50,
+        justifyContent: 'center',
+        alignItems: 'center',
+        elevation: 8,
     },
-    buttonText: {
+    aeButtonText: {
         color: '#fff',
         textAlign: 'center',
         fontWeight: 'bold',
+        fontSize: 36,
     },
-    smallButton: {
-        backgroundColor: '#2196F3', // Button background color
-        padding: 3,
-        borderRadius: 8,
-        width: 80,
-        margin: 5,
+    calendar: {
+        width: '100%'
     }
 });
 
