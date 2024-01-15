@@ -1,16 +1,20 @@
 require('dotenv').config()
-
-const User = require('../models/users');
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
+const { Op } = require('sequelize');
 
+
+const User = require('../models/users');
+const CalendarEvent = require('../models/calendarEvents')
 
 /////////////////////
 // standard routes //
 /////////////////////
 const getUsers = async (req, res, next) => {
     try {
-        const users = await User.findAll();
+        const users = await User.findAll({
+            attributes: {exclude: ['createdAt', 'updatedAt', 'password']}
+        });
         return res.status(200).json(users)
     }
     catch (error) {
@@ -21,7 +25,9 @@ const getUsers = async (req, res, next) => {
 const getUserById = async (req, res, next) => {
     try{
         // findByPk means find by primary key (aka id)
-        const user = await User.findByPk(req.params.id)
+        const user = await User.findByPk(req.params.id, {
+            attributes: {exclude: ['createdAt', 'updatedAt', 'password']}
+        })
         return res.status(200).json(user)
     }
     catch (error) {
@@ -57,6 +63,7 @@ const updateUser = async (req, res, next) => {
                     // since I know I will only update one user, set second element to updatedUser
             const [_, updatedUser] = await User.update(userModel, {
                 where: {id: req.params.id},
+                attributes: {exclude: ['createdAt', 'updatedAt', 'password']},
                 returning: true // returns updated user row
             })
 
@@ -114,6 +121,58 @@ const getUserByUsername = async (req, res, next) => {
     }
 }
 
+const getAvailableUsers = async (req, res, next) => {
+    try {
+        const { startDate, endDate } = req.query;
+        let whereCondition = {};
+
+        if (startDate && endDate) {
+            // If both startDate and endDate are provided
+            whereCondition = {
+                startDate: {
+                    [Op.lt]: endDate,
+                },
+                endDate: {
+                    [Op.gt]: startDate,
+                },
+            };
+        } else if (startDate) {
+            // If only startDate is provided
+            whereCondition = {
+                endDate: {
+                    [Op.gt]: startDate,
+                },
+            };
+        } else {
+            // If neither startDate nor endDate is provided, handle accordingly
+            return res.status(400).json({ error: 'Invalid request. Please provide startDate and/or endDate.' });
+        }
+
+        // Find all calendar events that intersect with the selected date range
+        const overlappingEvents = await CalendarEvent.findAll({
+            where: whereCondition
+        });
+
+        // Extract user IDs from overlapping events
+        const overlappingUserIds = overlappingEvents.map((event) => event.commentableId);
+
+        // Find users that do not have overlapping events
+        const availableUsers = await User.findAll({
+            where: {
+                id: {
+                    [Op.notIn]: overlappingUserIds,
+                },
+            },
+            attributes: {exclude: ['createdAt', 'updatedAt', 'password']}
+        });
+
+        return res.status(200).json(availableUsers);
+    } catch (error) {
+        console.log('ERROR WITHIN AVAIL USERS: ', error)
+        return res.status(500).json({ error: 'Failed to fetch available users' });
+    }
+};
+
 const currentUser = async (req, res, next) => {
     try {
         // Access the user object from req.user set in the middleware
@@ -144,4 +203,5 @@ module.exports = {
     updateUser,
     deleteUser,
     currentUser,
+    getAvailableUsers,
 }

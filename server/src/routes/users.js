@@ -9,6 +9,9 @@ router.route('/')
 router.route('/currentUser')
     .get(controller.currentUser)
 
+router.route('/availableUsers')
+    .get(controller.getAvailableUsers)
+
 router.route('/:id')
     .get(controller.getUserById)
     .patch(controller.updateUser)
@@ -16,11 +19,5 @@ router.route('/:id')
 
 router.route('/currentUser/:username')
     .get(controller.getUserByUsername)
-
-// router.route('/login')
-//     .post(controller.loginUser)
-
-// router.route('/logout')
-//     .delete(controller.logoutUser)
 
 module.exports = router

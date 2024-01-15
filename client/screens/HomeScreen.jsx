@@ -10,6 +10,7 @@ import ProductionDetails from "./ProductionDetails";
 
 // COMPONENTS
 import NavigationBar from "../components/NavigationBar"
+import AddProduction from "./AddProduction";
 
 const Stack = createNativeStackNavigator()
 
@@ -23,12 +24,9 @@ function HomeScreen() {
     useEffect(()=> {
         const fetchHome = async () => {
             try {
-                const validToken = await checkAccessToken();
-                if (validToken) {
-                    setIsLoggedIn(true)
-                }
+                await checkAccessToken();
             } catch (error) {
-                setIsLoggedIn(false); // Update state on token check failure
+                setIsLoggedIn(false);
             } 
         };
 
@@ -39,19 +37,55 @@ function HomeScreen() {
         <Stack.Navigator>
             {isLoggedIn ? (
                 <>
-                    <Stack.Screen name="Main" component={NavigationBar} options={{ headerShown: false }} />
-                    <Stack.Screen name="ProductionDetails" component={ProductionDetails} />
+                    <Stack.Screen 
+                        name="Main" 
+                        component={NavigationBar} 
+                        options={{ 
+                            headerShown: false 
+                        }} 
+                        />
+                    <Stack.Screen 
+                        name="ProductionDetails" 
+                        component={ProductionDetails} 
+                        options={{ 
+                            headerShown: true 
+                        }} 
+                        />
+                    <Stack.Screen
+                        name="Add Production"
+                        component={AddProduction}
+                        options={{
+                            headerShown: true
+                        }}
+                    />
                 </>
             ) : (
                 <>
-                    <Stack.Screen name="Login" component={Login} />
-                    <Stack.Screen name="SignUp" component={SignUp} />
-                    <Stack.Screen name="JobBoard" component={JobBoard} />
+                    <Stack.Screen 
+                        name="Login" 
+                        component={Login}
+                        options={{ 
+                            headerShown: false 
+                        }} 
+                    />
+                    <Stack.Screen 
+                        name="SignUp" 
+                        component={SignUp} 
+                        options={{ 
+                            headerShown: true 
+                        }} 
+                    />
+                    <Stack.Screen 
+                        name="JobBoard" 
+                        component={JobBoard}
+                        options={{ 
+                            headerShown: false 
+                        }}
+                    />
                 </>
             )}
         </Stack.Navigator>
     )
-
 }
 
 export default HomeScreen;

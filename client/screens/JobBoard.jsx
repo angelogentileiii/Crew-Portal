@@ -1,10 +1,7 @@
-import React, { useState, useContext, useCallback , useEffect} from 'react';
+import React, { useState, useContext, useEffect} from 'react';
 import { StyleSheet, Text, ScrollView, TouchableOpacity } from 'react-native';
-// import { useFocusEffect } from '@react-navigation/native';
-import { Card, Button } from 'react-native-paper';
+import { Card } from 'react-native-paper';
 import { AuthContext } from '../contextProviders/AuthContext';
-
-// import * as SecureStore from 'expo-secure-store'
 
 import useFetchAuthWrapper from '../components/fetchAuthWrapper';
 
@@ -18,32 +15,28 @@ function JobBoard({ navigation }){
     const fetchAuthWrapper = useFetchAuthWrapper({ navigation });
 
     const fetchData = async () => {
-        // let token = await SecureStore.getItemAsync('accessToken')
-        // console.log('WITHIN JOBBOARD ATOKEN: ', token)
 
         try {
             await checkAccessToken()
-            // let token = await SecureStore.getItemAsync('accessToken')
             const responseJSON = await fetchAuthWrapper('http://192.168.1.156:5555/productions', {
             // const responseJSON = await fetchAuthWrapper('http://10.129.3.82:5555/productions', {
                 method: 'GET',
             });
 
-            // console.log('AFTER PRODUCTIONS FETCH: ', responseJSON)
             setProductions(responseJSON);
         } catch (error) {
-            console.error('Error occurred while fetching:', error);
+            console.error('Error occurred while fetching productions:', error);
         }
     };
 
     useEffect(() => {
-        const unsubscribeFocus = navigation.addListener('focus', () => {
+        const screenFocus = navigation.addListener('focus', () => {
             fetchData();
         });
 
         // Cleanup the listener when the component is unmounted
         return () => {
-            unsubscribeFocus();
+            screenFocus();
         };
     }, [navigation]);
 
@@ -75,16 +68,6 @@ function JobBoard({ navigation }){
     return (
         <ScrollView contentContainerStyle={styles.container}>
             {productionInfo}
-            <TouchableOpacity
-                style={styles.button}
-                underlayColor="#1E88E5" // Color when pressed
-                onPress={() => {
-                    attemptLogout()
-                    navigation.navigate('HomeScreen')
-                }}
-            >
-                <Text style={styles.buttonText}>Logout?</Text>
-            </TouchableOpacity>
         </ScrollView>
     )
 }
@@ -95,7 +78,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         alignItems: 'center',
         justifyContent: 'center',
-        paddingTop: '5%',
+        paddingVertical: '5%',
     },
     cards: {
         width: '100%',

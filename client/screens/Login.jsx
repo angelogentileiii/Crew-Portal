@@ -107,7 +107,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
-    // verticalAlign: 'center',
   },
   container2: {
     backgroundColor: '#fff',

@@ -1,6 +1,3 @@
-
-
-
 import React, { useState, useEffect, useContext } from 'react';
 import { View, ScrollView, StyleSheet, TouchableOpacity, Text } from 'react-native';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
@@ -11,12 +8,10 @@ import useCalendar from '../components/useCalendarHook';
 import useFetchAuthWrapper from '../components/fetchAuthWrapper';
 import { AuthContext } from '../contextProviders/AuthContext';
 
-function EventCalendar({ navigation }) {
-    const [selectedStartDate, setSelectedStartDate] = useState(null);
-    const [selectedEndDate, setSelectedEndDate] = useState(null);
-    // const [isStartPickerVisible, setStartPickerVisible] = useState(false);
-    // const [isEndPickerVisible, setEndPickerVisible] = useState(false);
-    const [isModalVisible, setModalVisible] = useState(false);
+function EventCalendar({ navigation, isModalVisible, setModalVisible }) {
+    // const [isModalVisible, setModalVisible] = useState(false);
+
+    console.log(isModalVisible)
     const [dbEvents, setDBEvents] = useState([])
 
     const fetchAuthWrapper = useFetchAuthWrapper({ navigation });
@@ -66,32 +61,6 @@ function EventCalendar({ navigation }) {
         fetchCalEvents()
     }, [])
 
-    const handleStartConfirm = async (startDate) => {
-        setSelectedStartDate(startDate);
-        const permissionGranted = await getPermission();
-        if (!permissionGranted) {
-            openSettings();
-        }
-    };
-
-    const handleEndConfirm = async (endDate) => {
-        try {
-            if (selectedStartDate) {
-                setSelectedEndDate(endDate);
-            } else {
-                console.error('A start date is necessary for the event.')
-            }
-            const permissionGranted = await getPermission();
-    
-            if (!permissionGranted) {
-                openSettings();
-            }
-        } 
-        catch (error) {
-            console.error('Error creating event:', error)
-        }
-    }
-
     const handleEventSubmit = async ({ eventName, startDate, endDate }) => {
         const calendarId = await getCalendarId();
         if (!calendarId) {
@@ -116,10 +85,6 @@ function EventCalendar({ navigation }) {
                         await fetchAuthWrapper(`http://192.168.1.156:5555/calendarEvents/`, {
                         // await fetchAuthWrapper('http://10.129.3.82:5555/calendarEvents/', {
                             method: 'POST',
-                            // headers: {
-                            //     'Content-Type': 'application/json',
-                            //     'Authorization': 'Bearer ' + token,
-                            // },
                             body: JSON.stringify({
                                 startDate,
                                 endDate,
@@ -204,44 +169,53 @@ function EventCalendar({ navigation }) {
         <View style={styles.container}>
                 {/* Calendar Component */}
                 <Calendar
-                    style={styles.calendar}
+                    style={{
+                        borderWidth: 1,
+                        borderColor: 'gray',
+                        borderRadius: 10,
+                        minWidth: '95%',
+                        margin: '2.5%',
+                    }}
+                    theme={{
+                        textMonthFontWeight: 'bold',
+                    }}
+                    enableSwipeMonths={true}
+                    markingType={'period'}
                     markedDates={generateMarkedDates()}
                     onDayPress={(day) => {
                     // Handle day press if needed
                     console.log('Selected day', day);
                     }}
                 />
-                <ScrollView>
+                <ScrollView 
+                    style={styles.scrollView}
+                    contentContainerStyle={styles.scrollViewContent}
+                    >
 
                 {/* User's Events */}
                 {(dbEvents.length > 0) ? dbEvents.map((event, index) => {
                     return (
-                        <View key={index}>
-                            <Text>{event.eventName}</Text>
-                            <Text>Start: {event.startDate}</Text>
-                            <Text>End: {event.endDate}</Text>
+                        <View key={index} style={styles.eventContainer}>
                             <TouchableOpacity
-                                style={styles.smallButton}
+                                style={styles.deleteButton}
                                 underlayColor="#1E88E5" // Color when pressed
                                 onPress={() => {
                                     handleDeleteEvent(event.nativeCalId, event.id)
                                 }}
                             >
-                                <Text style={styles.buttonText}>Delete Event</Text>
+                                <Text style={styles.deleteButtonText}>X</Text>
                             </TouchableOpacity>
+                            <View style={styles.eventInfoContainer}>
+                                <Text>{event.eventName}</Text>
+                                <Text>Start: {event.startDate}</Text>
+                                <Text>End: {event.endDate}</Text>
+                            </View>
+                            
                         </View>
                     )
                 }): (null)}
             </ScrollView>
 
-            {/* Opens Date Selector Modal */}
-            <TouchableOpacity
-                    style={styles.addEventButton}
-                    underlayColor="#1E88E5"
-                    onPress={() => setModalVisible(true)}
-                >
-                    <Text style={styles.aeButtonText}>+</Text>
-                </TouchableOpacity>
             <AddEventModal
                 isVisible={isModalVisible}
                 onClose={() => setModalVisible(false)}
@@ -259,22 +233,27 @@ const styles = StyleSheet.create({
         padding: 20,
         backgroundColor: '#fff',
     },
-    addEventButton: {
-        backgroundColor: '#2196F3', // Button background color
-        borderRadius:500,
-        padding: '2%',
+    scrollView: {
+        width: '95%',
+    },
+    scrollViewContent: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingEnd: '10%',
+        paddingTop: '3%',
+        paddingBottom: '9%',
     },
     addEventButton: {
         position: 'absolute',
         bottom: 20,
         right: 20,
-        backgroundColor: '#2196F3', // Button background color
-        borderRadius: 50, // Make it a circle
+        backgroundColor: '#2196F3',
+        borderRadius: 50,
         width: 50,
         height: 50,
         justifyContent: 'center',
         alignItems: 'center',
-        elevation: 8,
+        elevation: 10,
     },
     aeButtonText: {
         color: '#fff',
@@ -282,9 +261,32 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         fontSize: 36,
     },
-    calendar: {
-        width: '100%'
-    }
+    eventContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 10,
+    },
+    eventInfoContainer: {
+        marginRight: 5,
+        padding: 5,
+    },
+    deleteButton: {
+        backgroundColor: '#2196F3',
+        borderRadius: 25,
+        width: 25,
+        height: 25,
+        padding: '2%',
+        marginRight: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    deleteButtonText: {
+        color: '#fff',
+        textAlign: 'center',
+        fontWeight: 'bold',
+    },
 });
 
 export default EventCalendar;
+
+

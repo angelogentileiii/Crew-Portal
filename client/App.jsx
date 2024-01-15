@@ -1,4 +1,5 @@
 import React from 'react'
+import { StyleSheet } from 'react-native'
 import { AuthProvider } from './contextProviders/AuthContext'
 
 import { NavigationContainer } from '@react-navigation/native'
@@ -16,7 +17,6 @@ function App() {
         <NavigationContainer>
           <Stack.Navigator 
             initialRouteName='HomeScreen'
-            headerMode="none"
             >
             <Stack.Screen 
               name="HomeScreen"

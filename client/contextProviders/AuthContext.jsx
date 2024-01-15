@@ -27,7 +27,10 @@ export const AuthProvider = ({ children, navigation }) => {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(userInfo),
+                body: JSON.stringify({
+                    ...userInfo,
+                    userType: type,
+                }),
             });
             const returnedData = await response.json();
             console.log('WITHIN SIGNUP ATTEMPT', returnedData)
@@ -38,8 +41,8 @@ export const AuthProvider = ({ children, navigation }) => {
                 SecureStore.setItemAsync('refreshToken', returnedData.data.refreshToken.toString())
 
                 setIsLoggedIn(true)
-                getCurrentUser(type)
-                setCurrentUserType(type)
+                getCurrentUser(returnedData.data.userType)
+                setCurrentUserType(returnedData.data.userType)
 
             } else {
                 console.error('Auth Context - Registration error:', data.error);
@@ -64,27 +67,25 @@ export const AuthProvider = ({ children, navigation }) => {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(userInfo),
+                body: JSON.stringify({
+                    ...userInfo, 
+                    userType: type,
+                }),
             });
 
             if (!response.ok) {
                 const errorData = await response.json(); // Parse error response
                 console.error('Login error:', errorData);
             }
-
-            // console.log('RESPONSE OK:', response.ok)
             
             const returnedData = await response.json();
-            console.log('LOGIN RESPONSE AFTER:', returnedData)
 
             await SecureStore.setItemAsync('accessToken', returnedData.data.accessToken.toString())
             await SecureStore.setItemAsync('refreshToken', returnedData.data.refreshToken.toString())
-
-            console.log('ATOKEN LOGIN FUNCTION:', await SecureStore.getItemAsync('accessToken'))
             
             setIsLoggedIn(true)
-            getCurrentUser(type)
-            setCurrentUserType(type)
+            getCurrentUser(returnedData.data.userType)
+            setCurrentUserType(returnedData.data.userType)
 
         } catch (error) {
             console.error('Login error:', error);
@@ -116,7 +117,7 @@ export const AuthProvider = ({ children, navigation }) => {
     const checkAccessToken = async () => { 
         try {
             const token = await SecureStore.getItemAsync('accessToken')
-            console.log('WITHIIN CHECK ACCESS: ', token)
+            console.log('WITHIN CHECK ACCESS: ', token)
             if (token) {
                 try {
                     const response = await fetch(`http://192.168.1.156:5555/auth/decodeToken`, {
@@ -129,15 +130,26 @@ export const AuthProvider = ({ children, navigation }) => {
                     })
 
                     console.log('Response status:', response.status);
-                    // console.log('Before conditional', await response.json())
+
                     if (response.ok) {
                         const responseJSON = await response.json()
 
-                        // console.log('Within checkAccess Condition: ', responseJSON)
+                        // set logged in state and the current userType state
                         setIsLoggedIn(true)
+                        setCurrentUserType(responseJSON.data.userType)
 
-                        // setCurrentUser(responseJSON)
-                        console.log('Logged In Status:', isLoggedIn)
+                        // checks token expiration
+                        const expirationTime = new Date(responseJSON.exp * 1000);
+                        const currentTime = new Date();
+
+                        // checks remaining time till expiration
+                        const timeRemaining = expirationTime - currentTime;
+
+                        if (timeRemaining < 5 * 60 * 1000) {
+                            // Token is about to expire, refresh it
+                            const newAccessToken = await refreshTokens();
+                            SecureStore.setItemAsync('accessToken', newAccessToken)
+                        }
 
                         return responseJSON
                     }
@@ -160,7 +172,6 @@ export const AuthProvider = ({ children, navigation }) => {
             return null; // No refresh token available
         }
 
-        // console.log("REFRESHING TOKENS CHECK!")
 
         try {
             const response = await fetch('http://192.168.1.156:5555/auth/refreshToken', {
@@ -174,8 +185,7 @@ export const AuthProvider = ({ children, navigation }) => {
 
             if (response.ok) {
                 const { accessToken } = await response.json();
-                // Optionally update the user context with the new access token
-                // setUser({ ...user, accessToken }); // Update the user context
+
                 return accessToken; // Return the new access token
             } else {
                 throw new Error('Token refresh failed');
@@ -190,9 +200,6 @@ export const AuthProvider = ({ children, navigation }) => {
         const endpoint = await type === 'crew' ? '/users/currentUser' : '/productionCompanies/currentUser';
         const token = await SecureStore.getItemAsync('accessToken')
 
-        console.log('CURRENT USER ENDPOINT: ', `http://192.168.1.156:5555${endpoint}`)
-        console.log('CURRENT USER ATOKEN: ', token)
-
         try {
             const responseJSON = await fetch(`http://192.168.1.156:5555${endpoint}`, {
             // const responseJSON = await fetchAuthWrapper(`http://10.129.3.82:5555${endpoint}`, {
@@ -203,7 +210,6 @@ export const AuthProvider = ({ children, navigation }) => {
                 }
             })
 
-            // console.log('AFTER CURRENT USER FETCH: ', await responseJSON.json())
             const currentUser = await responseJSON.json()
 
 
@@ -213,6 +219,14 @@ export const AuthProvider = ({ children, navigation }) => {
             console.error('Error occurred while Fetching: ', error)
         }
     }
+
+    useEffect(() => {
+        const checkTokenOnAppLoad = async () => {
+            await checkAccessToken();
+        };
+    
+        checkTokenOnAppLoad();
+    }, []);
 
     const authContext = {
         attemptSignup,
