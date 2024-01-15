@@ -4,13 +4,18 @@ import EventCalendar from '../screens/EventCalendar';
 
 const Stack = createNativeStackNavigator();
 
-export default function CalendarStack() {
+export default function CalendarStack({ isModalVisible, setModalVisible}) {
     return (
         <Stack.Navigator 
-        initialRouteName="EventCalendar" 
+        initialRouteName="Event Calendar" 
         mode="modal"
         >
-            <Stack.Screen name="EventCalendar" component={EventCalendar} options={{ headerShown: false }}/>
+            <Stack.Screen 
+                name="Event Calendar" 
+                options={{ headerShown: false }}
+            >
+                {() => <EventCalendar isModalVisible={isModalVisible} setModalVisible={setModalVisible} />}
+            </Stack.Screen>
         </Stack.Navigator>
     );
 }

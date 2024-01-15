@@ -4,15 +4,7 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 function AvailabilitySelector ({ 
     onStartDateSelected, 
-    onEndDateSelected, 
-    // selectedStartDate, 
-    // setSelectedStartDate, 
-    // selectedEndDate, 
-    // setSelectedEndDate,
-    // isStartPickerVisible,
-    // setStartPickerVisible,
-    // isEndPickerVisible,
-    // setEndPickerVisible
+    onEndDateSelected,
 }) {
     const [isStartPickerVisible, setStartPickerVisible] = useState(false);
     const [isEndPickerVisible, setEndPickerVisible] = useState(false);

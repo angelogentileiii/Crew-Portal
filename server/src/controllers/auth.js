@@ -34,12 +34,17 @@ const signupUser = async (req, res, next) => {
                     { 
                         "username": user.username,
                         "email": user.email,
+                        "userType": userType
                     },
                     process.env.ACCESS_TOKEN_SECRET,
                     { expiresIn: '120s'}
                 );
                 const refreshToken = jwt.sign(
-                    { "username": user.username},
+                    { 
+                        "username": user.username,
+                        "email": user.email,
+                        "userType": userType
+                    },
                     process.env.REFRESH_TOKEN_SECRET,
                     { expiresIn: '1d'}
                 );
@@ -48,6 +53,7 @@ const signupUser = async (req, res, next) => {
                     data: {
                         username: user.username,
                         email: user.email,
+                        userType: userType,
                         accessToken: accessToken,
                         refreshToken: refreshToken
                     }
@@ -67,7 +73,7 @@ const signupUser = async (req, res, next) => {
 }
 
 const loginUser = async (req, res, next) => {
-    const { username, password } = req.body
+    const { username, password, userType } = req.body
     // console.log("WITHIN LOGIN USER:", req.body)
 
     // basic enter both items
@@ -104,6 +110,7 @@ const loginUser = async (req, res, next) => {
             { 
                 "username": foundUser.username,
                 "email": foundUser.email,
+                "userType": userType
             },
             process.env.ACCESS_TOKEN_SECRET,
             { expiresIn: '15m'}
@@ -115,7 +122,8 @@ const loginUser = async (req, res, next) => {
         const refreshToken = jwt.sign(
             { 
                 "username": foundUser.username,
-                "email": foundUser.email
+                "email": foundUser.email,
+                "userType": userType
             },
             process.env.REFRESH_TOKEN_SECRET,
             { expiresIn: '1d'}
@@ -128,6 +136,7 @@ const loginUser = async (req, res, next) => {
             data: {
                 username: foundUser.username,
                 email: foundUser.email,
+                userType: userType,
                 accessToken: accessToken,
                 refreshToken: refreshToken
             }
@@ -165,6 +174,7 @@ const signupPC = async (req, res, next) => {
                     { 
                         "username": pc.username,
                         "email": pc.email,
+                        "userType": userType,
                     },
                     process.env.ACCESS_TOKEN_SECRET,
                     { expiresIn: '120s'}
@@ -174,6 +184,7 @@ const signupPC = async (req, res, next) => {
                     { 
                         "username": pc.username,
                         "email": pc.email,
+                        "userType": userType
                     },
                     process.env.REFRESH_TOKEN_SECRET,
                     { expiresIn: '1d'}
@@ -184,6 +195,7 @@ const signupPC = async (req, res, next) => {
                     data: {
                         username: pc.username,
                         email: pc.email,
+                        userType: userType,
                         accessToken: accessToken,
                         refreshToken: refreshToken
                     }
@@ -204,7 +216,7 @@ const signupPC = async (req, res, next) => {
 
 const loginPC = async (req, res, next) => {
     console.log('WITHIN LOGINPC', req.body)
-    const { username, password } = req.body
+    const { username, password, userType } = req.body
 
     // basic enter both items
     if (!username || !password) {
@@ -237,6 +249,7 @@ const loginPC = async (req, res, next) => {
             { 
                 "username": foundPC.username,
                 "email": foundPC.email,
+                "userType": userType
             },
             process.env.ACCESS_TOKEN_SECRET,
             { expiresIn: '15m'}
@@ -246,7 +259,8 @@ const loginPC = async (req, res, next) => {
         const refreshToken = jwt.sign(
             { 
                 "username": foundPC.username,
-                "email": foundPC.email
+                "email": foundPC.email,
+                "userType": userType
             },
             process.env.REFRESH_TOKEN_SECRET,
             { expiresIn: '1d'}
@@ -258,6 +272,7 @@ const loginPC = async (req, res, next) => {
             data: {
                 username: foundPC.username,
                 email: foundPC.email,
+                userType: userType,
                 accessToken: accessToken,
                 refreshToken: refreshToken
             }
@@ -285,7 +300,8 @@ const refreshTokens = async (req, res, next) => {
         const accessToken = jwt.sign(
             {
                 username: decoded.username,
-                email: decoded.email
+                email: decoded.email,
+                userType: decoded.userType,
             },
             process.env.ACCESS_TOKEN_SECRET,
             { expiresIn: '15m' } // Set your desired expiry time for the new access token
@@ -316,7 +332,8 @@ const decodeToken = (req, res) => {
         return res.status(200).json(
             { 
                 success: true, 
-                data: decodedToken 
+                data: decodedToken,
+                exp: decodedToken.exp
             }
         );
     } catch (error) {

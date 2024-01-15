@@ -5,7 +5,9 @@ const ProductionCompany = require('../models/productionCompanies')
 /////////////////////
 const getProductionCompanies = async (req, res, next) => {
     try {
-        const productionCompanies = await ProductionCompany.findAll();
+        const productionCompanies = await ProductionCompany.findAll({
+            attributes: {exclude: ['createdAt', 'updatedAt', 'password']}
+        });
         
         if (!productionCompanies) {
             res.status(404).json('No production companies found.')
@@ -21,7 +23,10 @@ const getProductionCompanies = async (req, res, next) => {
 const getProductionCompanyById = async (req, res, next) => {
     try{
         // findByPk means find by primary key (aka id)
-        const productionCompany = await ProductionCompany.findByPk(req.params.id)
+        const productionCompany = await ProductionCompany.findByPk(req.params.id, {
+            attributes: {exclude: ['createdAt', 'updatedAt', 'password']}
+        })
+
         if (!productionCompany) {
             return res.status(404).json('No production company found.')
         }
@@ -49,6 +54,7 @@ const updateProductionCompany = async (req, res, next) => {
         try {
             const [_, updatedProductionCompany] = await ProductionCompany.update(productionCompanyModel, {
                 where: {id: req.params.id},
+                attributes: {exclude: ['createdAt', 'updatedAt', 'password']},
                 returning: true
             })
 

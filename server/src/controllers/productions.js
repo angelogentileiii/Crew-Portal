@@ -102,6 +102,7 @@ const getProductionByPC = async (req, res, next) => {
     try {
         const productionCompany = await ProductionCompany.findOne({
             where: {name: req.params.pcName},
+            attributes: {exclude: ['createdAt', 'updatedAt', 'password']}
         });
 
         console.log(productionCompany.dataValues)

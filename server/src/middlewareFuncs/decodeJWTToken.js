@@ -30,7 +30,7 @@ const decodeJwtToken = (req, res, next)=>{
             const { username, email } = decodedToken;
             // console.log(username, email)
             req.user = { username, email }; // Attaching user information to req.user
-            console.log('DECODE: ', req.user)
+            console.log('DECODE: ', decodedToken.exp)
         }
         next()
     }
