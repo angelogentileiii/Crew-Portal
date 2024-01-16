@@ -36,7 +36,6 @@ function EventCalendar({ navigation, isModalVisible, setModalVisible }) {
 
         try {
             // let token = await SecureStore.getItemAsync('accessToken')
-            // console.log('WITHIN USEEFFECT:', token)
 
             // const responseJSON = await fetchAuthWrapper(`http://192.168.1.156:5555/calendarEvents${endpoint}`, {
             const responseJSON = await fetchAuthWrapper(`http://10.129.3.82:5555/calendarEvents${endpoint}`, {
@@ -227,10 +226,18 @@ function EventCalendar({ navigation, isModalVisible, setModalVisible }) {
 
     return (
         <View style={styles.container}>
-                <Button
-                    title="Show All Events"
-                    onPress={() => setShowAllEvents(true)}
-                />
+                {selectedDay !== null ? (
+                    <Button
+                        title="Show All Events"
+                        onPress={() => {
+                            setShowAllEvents(true)
+                            setSelectedDay(null)
+                        }}
+                    />
+                ) : (
+                    null
+                )}
+
                 {/* Calendar Component */}
                 <Calendar
                     style={{
