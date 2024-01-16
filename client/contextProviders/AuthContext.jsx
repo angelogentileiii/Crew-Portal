@@ -61,8 +61,8 @@ export const AuthProvider = ({ children, navigation }) => {
         const endpoint = await type === 'crew' ? '/auth/loginUser' : '/auth/loginPC';
 
         try {
-            const response = await fetch( `http://192.168.1.156:5555${endpoint}`, {
-            // const response = await fetch( `http://10.129.3.82:5555${endpoint}`, {
+            // const response = await fetch( `http://192.168.1.156:5555${endpoint}`, {
+            const response = await fetch( `http://10.129.3.82:5555${endpoint}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -75,7 +75,7 @@ export const AuthProvider = ({ children, navigation }) => {
 
             if (!response.ok) {
                 const errorData = await response.json(); // Parse error response
-                console.error('Login error:', errorData);
+                return errorData.message;
             }
             
             const returnedData = await response.json();
@@ -88,7 +88,7 @@ export const AuthProvider = ({ children, navigation }) => {
             setCurrentUserType(returnedData.data.userType)
 
         } catch (error) {
-            console.error('Login error:', error);
+            console.log('Login error:', error);
         }  
     }
 
@@ -120,8 +120,8 @@ export const AuthProvider = ({ children, navigation }) => {
             console.log('WITHIN CHECK ACCESS: ', token)
             if (token) {
                 try {
-                    const response = await fetch(`http://192.168.1.156:5555/auth/decodeToken`, {
-                    // const response = await fetch(`http://10.129.3.82:5555/auth/decodeToken`, {
+                    // const response = await fetch(`http://192.168.1.156:5555/auth/decodeToken`, {
+                    const response = await fetch(`http://10.129.3.82:5555/auth/decodeToken`, {
                         method: 'POST',
                         headers: {
                             'Accept': 'application/json',
@@ -174,8 +174,8 @@ export const AuthProvider = ({ children, navigation }) => {
 
 
         try {
-            const response = await fetch('http://192.168.1.156:5555/auth/refreshToken', {
-            // const response = await fetch('http://10.129.3.82:5555/auth/refreshToken', {
+            // const response = await fetch('http://192.168.1.156:5555/auth/refreshToken', {
+            const response = await fetch('http://10.129.3.82:5555/auth/refreshToken', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -216,7 +216,7 @@ export const AuthProvider = ({ children, navigation }) => {
             setCurrentUser(currentUser)
         }
         catch (error) {
-            console.error('Error occurred while Fetching: ', error)
+            console.log('Error occurred while Fetching User: ', error)
         }
     }
 

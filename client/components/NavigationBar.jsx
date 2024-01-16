@@ -121,7 +121,7 @@ function NavigationBar ({ navigation }) {
                         >
                             {() => <CalendarStack isModalVisible={isModalVisible} setModalVisible={setModalVisible} />}
                         </Tab.Screen>
-                        <Tab.Screen name="Crew List" component={CrewList} />
+                    <Tab.Screen name="Crew List" component={CrewList} />
                     <Tab.Screen name="Company Profile" component={PCProfile} />
                 </>
             )}

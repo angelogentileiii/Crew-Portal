@@ -16,10 +16,10 @@ function App() {
       <AuthProvider>
         <NavigationContainer>
           <Stack.Navigator 
-            initialRouteName='HomeScreen'
+            initialRouteName='Crew Portal'
             >
             <Stack.Screen 
-              name="HomeScreen"
+              name="Crew Portal"
               component={HomeScreen}
               options={{ headerShown: false }}
               />

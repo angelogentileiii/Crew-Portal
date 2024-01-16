@@ -11,6 +11,7 @@ import ProductionDetails from "./ProductionDetails";
 // COMPONENTS
 import NavigationBar from "../components/NavigationBar"
 import AddProduction from "./AddProduction";
+import UserAvailability from "./UserAvailability";
 
 const Stack = createNativeStackNavigator()
 
@@ -50,7 +51,14 @@ function HomeScreen() {
                         options={{ 
                             headerShown: true 
                         }} 
-                        />
+                    />
+                    <Stack.Screen
+                        name="Availability"
+                        component={UserAvailability}
+                        options={{
+                            headerShown: true
+                        }}
+                    />
                     <Stack.Screen
                         name="Add Production"
                         component={AddProduction}

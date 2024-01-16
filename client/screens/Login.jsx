@@ -7,6 +7,7 @@ import { AuthContext } from '../contextProviders/AuthContext';
 function Login({ navigation }) {
   const { register, handleSubmit, setValue } = useForm()
   const [userType, setUserType] = useState('crew')
+  const [errorResponse, setErrorResponse] = useState(null)
 
   // pull in context from AuthContext file
   const authContext = useContext(AuthContext)
@@ -20,14 +21,14 @@ function Login({ navigation }) {
   }, [])
 
   // sends the login information to db
-  const onSubmit = (formData) => {
+  const onSubmit = async (formData) => {
     try {
-      // console.log('Before login post', formData);
-      // console.log('Before login post', userType)
-      attemptLogin(formData, userType);
-    
+      const response = await attemptLogin(formData, userType);
+      console.log('Within Login Screen: ', response)
+      setErrorResponse(response)
+
       // Redirect to home
-      navigation.navigate('HomeScreen')
+      navigation.navigate('Crew Portal')
 
       if (Platform.OS === 'ios' || Platform.OS === 'android') {
         Vibration.vibrate(3); // Vibrate for 5ms!!
@@ -77,6 +78,11 @@ function Login({ navigation }) {
         onChangeText={onFieldChange('password')}
         // secureTextEntry={true} 
         />
+        {errorResponse ? (
+          <Text style={styles.errorMessage}>{errorResponse}</Text>
+        ): (
+          null
+        )}
         <TouchableOpacity
             style={styles.button}
             underlayColor="#1E88E5" // Color when pressed
@@ -159,6 +165,10 @@ const styles = StyleSheet.create({
     color: '#fff',
     textAlign: 'center',
     fontWeight: 'bold',
+  },
+  errorMessage:{
+    color: 'red',
+    fontSize: 12,
   },
 });
 

@@ -18,8 +18,8 @@ function JobBoard({ navigation }){
 
         try {
             await checkAccessToken()
-            const responseJSON = await fetchAuthWrapper('http://192.168.1.156:5555/productions', {
-            // const responseJSON = await fetchAuthWrapper('http://10.129.3.82:5555/productions', {
+            // const responseJSON = await fetchAuthWrapper('http://192.168.1.156:5555/productions', {
+            const responseJSON = await fetchAuthWrapper('http://10.129.3.82:5555/productions', {
                 method: 'GET',
             });
 
@@ -58,7 +58,7 @@ function JobBoard({ navigation }){
                                 navigation.push('ProductionDetails', {id: id})
                             }}
                         >
-                            <Text style={styles.cardButtonText}>View More</Text>
+                            <Text style={styles.cardButtonText}>View Details</Text>
                         </TouchableOpacity>
                     </Card.Actions>
             </Card>
@@ -66,7 +66,10 @@ function JobBoard({ navigation }){
     })
 
     return (
-        <ScrollView contentContainerStyle={styles.container}>
+        <ScrollView 
+            style={{ backgroundColor: '#fff' }}
+            contentContainerStyle={styles.container}
+        >
             {productionInfo}
         </ScrollView>
     )

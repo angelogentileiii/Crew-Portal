@@ -96,8 +96,8 @@ function AddProduction ({ navigation }) {
 
             console.log('FORM DATA BEFORE SUBMISSION:', formData);
 
-            const responseJSON = await fetchAuthWrapper('http://192.168.1.156:5555/productions', {
-            // await fetchAuthWrapper('http://10.129.3.82:5555/productions', {
+            // const responseJSON = await fetchAuthWrapper('http://192.168.1.156:5555/productions', {
+            const responseJSON = await fetchAuthWrapper('http://10.129.3.82:5555/productions', {
                 method: 'POST',
                 body: JSON.stringify({
                     ...formData,

@@ -27,8 +27,8 @@ function CrewList ({ navigation }) {
     const fetchUsers = async () => {
         try {
             await checkAccessToken()
-            const allUsers = await fetchAuthWrapper('http://192.168.1.156:5555/users', {
-            // const responseJSON = await fetchAuthWrapper('http://10.129.3.82:5555/users', {
+            // const allUsers = await fetchAuthWrapper('http://192.168.1.156:5555/users', {
+            const allUsers = await fetchAuthWrapper('http://10.129.3.82:5555/users', {
                 method: 'GET'
             })
 
@@ -39,8 +39,6 @@ function CrewList ({ navigation }) {
             console.warn('Error fetching Users', error)
         }
     }
-
-    console.log('SEARCH TEXT: ', searchText)
     
     useEffect(() => {
         const filteredCrew = crewList.filter((user) =>
@@ -61,8 +59,14 @@ function CrewList ({ navigation }) {
         setEndDate(endDate);
     };
 
+    const resetDates = () => {
+        setStartDate(null)
+        setEndDate(null)
+    }
+
     const handleDateSearch = async (start, end) => {
-        const URL = `http://192.168.1.156:5555/users/availableUsers`
+        // const URL = `http://192.168.1.156:5555/users/availableUsers`
+        const URL = 'http://10.129.3.82:5555/users/availableUsers'
 
         try {
             if (start && !end) {
@@ -110,21 +114,13 @@ function CrewList ({ navigation }) {
         };
     }, [navigation]);
 
-    const crewInfo = filteredCrewList.map((production) => {
-        const { id } = production
-        return <CrewCard key={id} production={production} />
+    const crewInfo = filteredCrewList.map((crewMember) => {
+        const { id } = crewMember
+        return <CrewCard key={id} navigation={navigation} crewMember={crewMember} />
     })
 
     return (
         <View style={styles.container}>
-            {/* readjust this button later for styling */}
-            <Button title="Select Date(s)" onPress={() => setModalVisible(true)} />
-
-            {/* Add Reset button here */}
-            <TouchableOpacity style={styles.searchButton} onPress={fetchUsers}>
-                <Text style={styles.dateTimePickerButtonText}>Reset Dates</Text>
-            </TouchableOpacity>
-
             {/* SEARCH BAR */}
             <TextInput
                 style={styles.input}
@@ -133,6 +129,33 @@ function CrewList ({ navigation }) {
                 value={searchText}
                 onChangeText={setSearchText}
             />
+
+            {/* readjust this button later for styling */}
+            <TouchableOpacity
+                style={styles.dateTimePickerButton}
+                onPress={() => setModalVisible(true)}
+            >
+                {startDate !== null && endDate !== null ? (
+                    <Text style={styles.dateTimePickerButtonText}>From: {formatDate(startDate).toString()} to {formatDate(endDate).toString()}</Text>
+                ) : startDate !== null ? (
+                    <Text style={styles.dateTimePickerButtonText}>Selected Date: {formatDate(startDate).toString()}</Text>
+                ) : (
+                    <Text style={styles.dateTimePickerButtonText}>Search by Date</Text>
+                )}
+            </TouchableOpacity>
+
+
+            {startDate !== null ? (
+                // Add Reset button here
+                <TouchableOpacity style={styles.searchButton} onPress={() => {
+                    fetchUsers()
+                    resetDates()
+                }}>
+                    <Text style={styles.dateTimePickerButtonText}>Reset Dates</Text>
+                </TouchableOpacity>
+            ) : ( 
+                null 
+            )}
 
             <Modal
                 visible={isModalVisible}
@@ -160,10 +183,20 @@ function CrewList ({ navigation }) {
 
                         {isDateRangeSelected ? (
                             // multiple date search
-                            <AvailabilitySelector
-                                onStartDateSelected={handleStartDateSelected}
-                                onEndDateSelected={handleEndDateSelected}
-                            />
+                            <>
+                                <AvailabilitySelector
+                                    onStartDateSelected={(date) => setStartDate(date)}
+                                    onEndDateSelected={(date) => setEndDate(date)}
+                                />
+                                {startDate !== null && endDate !== null && (
+                                    <TouchableOpacity style={styles.dateTimePickerButton} onPress={() => {
+                                        handleDateSearch(startDate, endDate)
+                                        setModalVisible(false) 
+                                    }}>
+                                        <Text style={styles.dateTimePickerButtonText}>Search Date Range</Text>
+                                    </TouchableOpacity>
+                                )}
+                            </>
                         ) : (
                             <>
                                 {/* Singular Date Search */}
@@ -196,6 +229,7 @@ function CrewList ({ navigation }) {
                                 />
                             </>
                         )}
+
                     </View>
 
                     {/* Cancel Button */}
@@ -217,23 +251,28 @@ function CrewList ({ navigation }) {
 const styles = StyleSheet.create({
     container: {
         flexGrow: 1,
-        backgroundColor: '#fff',
         justifyContent: 'center',
         alignItems: 'center',
+        backgroundColor: '#fff',
+        // backgroundColor: 'red',
     },
     input: {
         borderWidth: 1,
         borderColor: '#ccc',
         padding: 12,
-        marginBottom: 20,
+        marginVertical: '5%',
         width: 250,
         borderRadius: 8, // Add rounded corners
+        backgroundColor: '#fff',
+        // backgroundColor: 'yellow'
     },
     scrollContainer: {
         flex: 1,
         width: '100%',
-        paddingTop: '5%',
-        paddingBottom: '50%',
+        // paddingVertical: 20,
+        marginBottom: '.25%',
+        // paddingBottom: 20,
+        backgroundColor: '#fff',
         // backgroundColor: 'blue',
     },
     modalContainer: {
@@ -247,7 +286,8 @@ const styles = StyleSheet.create({
         width: '95%',
         backgroundColor: '#fff',
         borderRadius: 15,
-        padding: 35,
+        // padding: 35,
+        // marginVertical: '5%',
         alignItems: 'center',
         shadowColor: '#000',
         shadowOffset: {

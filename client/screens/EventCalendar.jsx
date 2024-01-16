@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, ScrollView, StyleSheet, TouchableOpacity, Text } from 'react-native';
+import { View, ScrollView, StyleSheet, TouchableOpacity, Text, Button } from 'react-native';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
 
 // import AvailabilitySelector from '../components/AvailabilitySelector';
@@ -9,7 +9,8 @@ import useFetchAuthWrapper from '../components/fetchAuthWrapper';
 import { AuthContext } from '../contextProviders/AuthContext';
 
 function EventCalendar({ navigation, isModalVisible, setModalVisible }) {
-    // const [isModalVisible, setModalVisible] = useState(false);
+    const [selectedDay, setSelectedDay] = useState(null)
+    const [showAllEvents, setShowAllEvents] = useState(false);
 
     console.log(isModalVisible)
     const [dbEvents, setDBEvents] = useState([])
@@ -37,8 +38,8 @@ function EventCalendar({ navigation, isModalVisible, setModalVisible }) {
             // let token = await SecureStore.getItemAsync('accessToken')
             // console.log('WITHIN USEEFFECT:', token)
 
-            const responseJSON = await fetchAuthWrapper(`http://192.168.1.156:5555/calendarEvents${endpoint}`, {
-            // const responseJSON = await fetchAuthWrapper(`http://10.129.3.82:5555/calendarEvents${endpoint}`, {
+            // const responseJSON = await fetchAuthWrapper(`http://192.168.1.156:5555/calendarEvents${endpoint}`, {
+            const responseJSON = await fetchAuthWrapper(`http://10.129.3.82:5555/calendarEvents${endpoint}`, {
                 method: 'GET',
             })
 
@@ -82,8 +83,8 @@ function EventCalendar({ navigation, isModalVisible, setModalVisible }) {
                 if (returnedId) {
                     try {
                         // Send the event data to your backend
-                        await fetchAuthWrapper(`http://192.168.1.156:5555/calendarEvents/`, {
-                        // await fetchAuthWrapper('http://10.129.3.82:5555/calendarEvents/', {
+                        // await fetchAuthWrapper(`http://192.168.1.156:5555/calendarEvents/`, {
+                        await fetchAuthWrapper('http://10.129.3.82:5555/calendarEvents/', {
                             method: 'POST',
                             body: JSON.stringify({
                                 startDate,
@@ -115,8 +116,8 @@ function EventCalendar({ navigation, isModalVisible, setModalVisible }) {
         try {
             // console.log('WITHIN HANDLE DELETE', id)
             deleteEventsById(nativeId, 'Crew Calendar')
-            await fetchAuthWrapper(`http://192.168.1.156:5555/calendarEvents/${id}`, {
-            // await fetchAuthWrapper(`http://10.129.3.82:5555/calendarEvents/${id}`, {
+            // await fetchAuthWrapper(`http://192.168.1.156:5555/calendarEvents/${id}`, {
+            await fetchAuthWrapper(`http://10.129.3.82:5555/calendarEvents/${id}`, {
                 method: 'DELETE',
             })
             const updatedEvents = dbEvents.filter((event) => event.nativeCalId !== id)
@@ -160,6 +161,65 @@ function EventCalendar({ navigation, isModalVisible, setModalVisible }) {
         }
     }
 
+    const displayEvents = () => {
+        if (dbEvents.length > 0) {
+            if (selectedDay && !showAllEvents) {
+                const filteredEvents = dbEvents.filter((event) => {
+
+                    const eventStart = event.startDate.split('T')[0];
+                    const eventEnd = event.endDate.split('T')[0];
+                    const selectedDate = selectedDay
+
+                    return selectedDate >= eventStart && selectedDate <= eventEnd;
+                });
+        
+                return filteredEvents.map((event, index) => (
+                    <View key={index} style={styles.eventContainer}>
+                        <TouchableOpacity
+                            style={styles.deleteButton}
+                            underlayColor="#1E88E5" // Color when pressed
+                            onPress={() => {
+                                handleDeleteEvent(event.nativeCalId, event.id)
+                            }}
+                        >
+                            <Text style={styles.deleteButtonText}>X</Text>
+                        </TouchableOpacity>
+                        <View style={styles.eventInfoContainer}>
+                            <Text>{event.eventName}</Text>
+                            <Text>Start: {event.startDate}</Text>
+                            <Text>End: {event.endDate}</Text>
+                        </View>
+                    </View>
+                ));
+            } else {
+                return dbEvents.map((event, index) => (
+                    <View key={index} style={styles.eventContainer}>
+                        <TouchableOpacity
+                            style={styles.deleteButton}
+                            underlayColor="#1E88E5" // Color when pressed
+                            onPress={() => {
+                                handleDeleteEvent(event.nativeCalId, event.id)
+                            }}
+                        >
+                            <Text style={styles.deleteButtonText}>X</Text>
+                        </TouchableOpacity>
+                        <View style={styles.eventInfoContainer}>
+                            <Text>{event.eventName}</Text>
+                            <Text>Start: {event.startDate}</Text>
+                            <Text>End: {event.endDate}</Text>
+                        </View>
+                    </View>
+                ));
+            } 
+        } else {
+            return (
+                <View>
+                    <Text>User has no scheduled events at this time!</Text>
+                </View>
+            );
+        }
+    };
+
     // const removeCalendar = () => {
     //     setDBEvents([])
     //     deleteCalendar();
@@ -167,6 +227,10 @@ function EventCalendar({ navigation, isModalVisible, setModalVisible }) {
 
     return (
         <View style={styles.container}>
+                <Button
+                    title="Show All Events"
+                    onPress={() => setShowAllEvents(true)}
+                />
                 {/* Calendar Component */}
                 <Calendar
                     style={{
@@ -183,17 +247,20 @@ function EventCalendar({ navigation, isModalVisible, setModalVisible }) {
                     markingType={'period'}
                     markedDates={generateMarkedDates()}
                     onDayPress={(day) => {
-                    // Handle day press if needed
-                    console.log('Selected day', day);
+                        console.log('Selected day', day.dateString);
+                        setShowAllEvents(false)
+                        setSelectedDay(day.dateString)
                     }}
                 />
                 <ScrollView 
                     style={styles.scrollView}
                     contentContainerStyle={styles.scrollViewContent}
                     >
+                
+                    {displayEvents()}
 
                 {/* User's Events */}
-                {(dbEvents.length > 0) ? dbEvents.map((event, index) => {
+                {/* {(dbEvents.length > 0) ? dbEvents.map((event, index) => {
                     return (
                         <View key={index} style={styles.eventContainer}>
                             <TouchableOpacity
@@ -213,7 +280,8 @@ function EventCalendar({ navigation, isModalVisible, setModalVisible }) {
                             
                         </View>
                     )
-                }): (null)}
+                }): (null)} */}
+
             </ScrollView>
 
             <AddEventModal
