@@ -18,7 +18,7 @@ const useFetchAuthWrapper = ({ navigation }) => {
         try {
             // await checkAccessToken()
             let token = await SecureStore.getItemAsync('accessToken')
-            console.log('WITHIN AUTH WRAPPER: ', token)
+            // console.log('WITHIN AUTH WRAPPER: ', token)
 
             const response = await fetch(url, {
                 ...options, 

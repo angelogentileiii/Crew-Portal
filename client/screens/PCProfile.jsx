@@ -19,15 +19,15 @@ function CrewProfile ({ navigation }) {
             console.log('Check Access:', user)
 
             try {
-                const responseJSON = await fetchAuthWrapper('http://192.168.1.156:5555/productionCompanies/currentUser', {
-                // const responseJSON = await fetchAuthWrapper(`http://10.129.3.82:5555/productionCompanies/currentUser`, {
+                // const responseJSON = await fetchAuthWrapper('http://192.168.1.156:5555/productionCompanies/currentUser', {
+                const responseJSON = await fetchAuthWrapper(`http://10.129.3.82:5555/productionCompanies/currentUser`, {
                     method: 'GET',
                 })
 
                 setPCData(responseJSON)
             }
             catch (error) {
-                console.error('Error occurred while Fetching: ', error)
+                console.error('Error occurred while Fetching PC: ', error)
             }
         };
 

@@ -187,6 +187,31 @@ const getCalendarEventsByUser = async (req, res, next) => {
     }
 }
 
+const getCalEventsByUserID = async (req, res, next) => {
+    try {
+        const userId = req.params.id
+
+        const calendarEvents = await CalendarEvent.findAll({
+            where: {
+                commentableType: 'user',
+                commentableId: userId,
+            },
+        });
+
+        if (!calendarEvents || calendarEvents.length === 0) {
+            return res.status(200).json({
+                success: true, 
+                data: 'No events found'
+            });
+        }
+
+        const plainCalendarEvents = calendarEvents.map((event) => event.get({ plain: true }));
+        return res.status(200).json(plainCalendarEvents);
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+}
+
 module.exports = {
     getCalendarEvents,
     getCalendarEventById,
@@ -194,5 +219,6 @@ module.exports = {
     updateCalendarEvent,
     deleteCalendarEvent,
     getCalendarEventsByPC,
-    getCalendarEventsByUser
+    getCalendarEventsByUser,
+    getCalEventsByUserID
 }

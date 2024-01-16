@@ -19,15 +19,15 @@ function CrewProfile ({ navigation }) {
             console.log('Check Access:', user)
 
             try {
-                const responseJSON = await fetchAuthWrapper('http://192.168.1.156:5555/users/currentUser', {
-                // const responseJSON = await fetchAuthWrapper(`http://10.129.3.82:5555/users/currentUser/`, {
+                // const responseJSON = await fetchAuthWrapper('http://192.168.1.156:5555/users/currentUser', {
+                const responseJSON = await fetchAuthWrapper(`http://10.129.3.82:5555/users/currentUser/`, {
                     method: 'GET',
                 })
 
                 setUserData(responseJSON)
             }
             catch (error) {
-                console.error('Error occurred while Fetching: ', error)
+                console.error('Error occurred while Fetching Crew: ', error)
             }
         };
 

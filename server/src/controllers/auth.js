@@ -74,11 +74,14 @@ const signupUser = async (req, res, next) => {
 
 const loginUser = async (req, res, next) => {
     const { username, password, userType } = req.body
-    // console.log("WITHIN LOGIN USER:", req.body)
 
     // basic enter both items
-    if (!username || !password) {
-        return res.status(400).json({message: 'Username/Password are required.'})
+    if (!username) {
+        return res.status(400).json({message: 'Username is required'})
+    }
+
+    if (!password) {
+        return res.status(400).json({message: 'Password is required'})
     }
 
     // check to see if there is a user with the username entered
@@ -86,17 +89,10 @@ const loginUser = async (req, res, next) => {
         where: {username: username}
     })
 
-    console.log('WITHIN LOGIN USER:', foundUser)
-    console.log('WITHIN LOGIN USER:', foundUser.email)
-    console.log('WITHIN LOGIN USER:', foundUser. username)
-
     // if there is no user with that username
     if (!foundUser) {
-        return res.status(401).json({message: 'Must enter a valid username.'})
+        return res.status(401).json({message: 'Must enter valid account information'})
     }
-
-    console.log('FOUNDPC PWORD: ', foundUser.password)
-    console.log('REQ BODY PWORD: ', password)
 
     // check if the password in request matches the password for the user?
     const matchPassword = await bcrypt.compare(password, foundUser.password);
@@ -143,7 +139,7 @@ const loginUser = async (req, res, next) => {
         })
         
     } else {
-        return res.status(401).json({message: "Incorrect login information."})
+        return res.status(401).json({message: "Please re-enter password"})
     }
 }
 
@@ -219,8 +215,12 @@ const loginPC = async (req, res, next) => {
     const { username, password, userType } = req.body
 
     // basic enter both items
-    if (!username || !password) {
-        return res.status(400).json({message: 'Username/Password are required.'})
+    if (!username) {
+        return res.status(400).json({message: 'Username is required'})
+    }
+
+    if (!password) {
+        return res.status(400).json({message: 'Password is required'})
     }
 
     // check to see if there is a user with the username entered
@@ -228,19 +228,19 @@ const loginPC = async (req, res, next) => {
         where: {username: username}
     })
 
-    console.log('FOUNDPC: ', foundPC)
-    console.log('REQ BODY PWORD: ', password)
+    // console.log('FOUNDPC: ', foundPC)
+    // console.log('REQ BODY PWORD: ', password)
 
     if (!foundPC) {
-        return res.status(401).json({message: 'Must enter a valid username.'})
+        return res.status(401).json({message: 'Please enter a valid username'})
     }
 
-    console.log('FOUNDPC PWORD: ', foundPC);
+    // console.log('FOUNDPC PWORD: ', foundPC);
     // check if the password in request matches the password for the user?
     const matchPassword = await bcrypt.compareSync(password, foundPC.password);
     // const matchPassword = await bcrypt.compare('t123', foundPC.password);
 
-    console.log('MATCH PWORD: ', matchPassword);
+    // console.log('MATCH PWORD: ', matchPassword);
 
     if (matchPassword) {
         // don't pass the password!!
@@ -279,7 +279,7 @@ const loginPC = async (req, res, next) => {
         })
         
     } else {
-        return res.status(401).json({message: "Incorrect PC Login information."})
+        return res.status(401).json({message: "Please re-enter password"})
     }
 }
 

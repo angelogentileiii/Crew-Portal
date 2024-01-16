@@ -2,8 +2,8 @@ import React from 'react'
 import { TouchableOpacity, Text, View, StyleSheet } from 'react-native'
 import { Card } from 'react-native-paper'
 
-function CrewCard ({ production }) {
-    const {id, firstName, lastName, email, phoneNumber, unionMember, unionNumber} = production
+function CrewCard ({ crewMember, navigation }) {
+    const {id, firstName, lastName, email, phoneNumber, unionMember, unionNumber} = crewMember
 
     return (
         <View key={id} style={styles.scrollContent}>
@@ -18,9 +18,9 @@ function CrewCard ({ production }) {
                         <TouchableOpacity
                             style={styles.cardButton}
                             underlayColor="#1E88E5" // Color when pressed
-                            // onPress={() => {
-                            //     navigation.push('ProductionDetails', {id: id})
-                            // }}
+                            onPress={() => {
+                                navigation.push('Availability', {id: id})
+                            }}
                         >
                             <Text style={styles.cardButtonText}>View Availability</Text>
                         </TouchableOpacity>
@@ -34,10 +34,11 @@ const styles = StyleSheet.create({
     scrollContent: {
         alignItems: 'center',
         justifyContent: 'center',
+        backgroundColor: '#fff',
         // backgroundColor: 'green',
     },
     cards: {
-        margin: '2.5%',
+        marginVertical: '2.5%',
         width: '95%',
         backgroundColor: '#fff',
     },

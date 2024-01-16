@@ -74,7 +74,7 @@ function SignUp ({ navigation }) {
             Vibration.vibrate(3); // Vibrate for 5ms!!
         }
 
-        navigation.navigate('HomeScreen')
+        navigation.navigate('Crew Portal')
     }
 
     return (
