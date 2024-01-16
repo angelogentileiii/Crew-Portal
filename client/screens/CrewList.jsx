@@ -54,10 +54,6 @@ function CrewList ({ navigation }) {
         setStartDate(startDate);
         setDatePickerVisible(false)
     };
-    
-    const handleEndDateSelected = (endDate) => {
-        setEndDate(endDate);
-    };
 
     const resetDates = () => {
         setStartDate(null)

@@ -117,7 +117,8 @@ export const AuthProvider = ({ children, navigation }) => {
     const checkAccessToken = async () => { 
         try {
             const token = await SecureStore.getItemAsync('accessToken')
-            console.log('WITHIN CHECK ACCESS: ', token)
+            // console.log('WITHIN CHECK ACCESS: ', token)
+            
             if (token) {
                 try {
                     // const response = await fetch(`http://192.168.1.156:5555/auth/decodeToken`, {

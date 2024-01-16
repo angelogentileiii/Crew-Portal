@@ -117,7 +117,10 @@ function UserAvailability ({ route, navigation }) {
         <View>
             <Button
                 title="Show All Events"
-                onPress={() => setShowAllEvents(true)}
+                onPress={() => {
+                    setShowAllEvents(true)
+                    setSelectedDay(null)
+                }}
             />
             <Calendar
                     style={{
