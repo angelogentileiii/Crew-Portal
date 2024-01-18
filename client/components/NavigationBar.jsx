@@ -8,7 +8,6 @@ import PCProfile from '../screens/PCProfile';
 import CrewList from '../screens/CrewList';
 import CalendarStack from './CalendarStack';
 
-
 import { AuthContext } from '../contextProviders/AuthContext';
 
 const Tab = createBottomTabNavigator();
@@ -68,9 +67,9 @@ function NavigationBar ({ navigation }) {
                 screenOptions={{ 
                     tabBarVisible: isLoggedIn,
                     headerLeft: () => (
-                        <View style={{ flexDirection: 'row' }}>
-                            {logoutButton()}
-                        </View>
+                    <View style={{ flexDirection: 'row' }}>
+                        {logoutButton()}
+                    </View>
                     )
                 }}
             >
@@ -78,8 +77,16 @@ function NavigationBar ({ navigation }) {
                 <>
                     <Tab.Screen 
                         name="All Productions" 
-                        component={JobBoard} 
-                    />
+                        // options={{
+                        //     headerRight: () => (
+                        //         <View style={{flexDirection: 'row'}}>
+                        //             <Text>TO BE FILTER</Text>
+                        //         </View>
+                        //     )
+                        // }}
+                        component= {JobBoard}
+                    >
+                    </Tab.Screen>
                     <Tab.Screen 
                         name="My Calendar" 
                         options={{
@@ -93,14 +100,14 @@ function NavigationBar ({ navigation }) {
                         {() => <CalendarStack isModalVisible={isModalVisible} setModalVisible={setModalVisible} />}
                     </Tab.Screen>
                     <Tab.Screen 
-                        name="Crew Profile" 
+                        name="My Profile" 
                         component={CrewProfile} 
                     />
                 </>
             ) : (
                 <>
                     <Tab.Screen 
-                        name="All Productions" 
+                        name="Productions" 
                         options={{
                             headerRight: () => (
                                 <View style={{ flexDirection: 'row' }}>

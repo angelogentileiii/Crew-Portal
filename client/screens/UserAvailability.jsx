@@ -15,8 +15,8 @@ function UserAvailability ({ route, navigation }) {
 
     const fetchUserEvents = async () => {
         try {
-            // const responseJSON = await fetchAuthWrapper(`http://192.168.1.156:5555/calendarEvents${endpoint}`, {
-            const responseJSON = await fetchAuthWrapper(`http://10.129.3.82:5555/calendarEvents/user/${id}`, {
+            const responseJSON = await fetchAuthWrapper(`http://192.168.1.156:5555/calendarEvents/user/${id}`, {
+            // const responseJSON = await fetchAuthWrapper(`http://10.129.3.82:5555/calendarEvents/user/${id}`, {
                 method: 'GET',
             })
 
@@ -24,7 +24,6 @@ function UserAvailability ({ route, navigation }) {
                 // console.log('AFTER CAL EVENTS FETCH: ', responseJSON)
                 setUserEvents(responseJSON)
                 console.log('WITHIN USER AVAIL: ', responseJSON)
-
             } else {
                 setUserEvents([])
             }
@@ -84,44 +83,56 @@ function UserAvailability ({ route, navigation }) {
                     return selectedDate >= eventStart && selectedDate <= eventEnd;
                 });
         
-                return filteredEvents.map((event, index) => (
-                    <View key={index} style={styles.eventContainer}>
-                        <View style={styles.eventInfoContainer}>
-                            <Text>{event.eventName}</Text>
-                            <Text>Start: {event.startDate}</Text>
-                            <Text>End: {event.endDate}</Text>
-                        </View>
-                    </View>
-                ));
+                return (
+                    <ScrollView style={styles.scrollViewContainer} contentContainerStyle={styles.scrollViewContent}>
+                        {filteredEvents.map((event, index) => (
+                            <View key={index} style={styles.eventContainer}>
+                                <View style={styles.eventInfoContainer}>
+                                    <Text>{event.eventName}</Text>
+                                    <Text>Start: {event.startDate}</Text>
+                                    <Text>End: {event.endDate}</Text>
+                                </View>
+                            </View>
+                        ))}
+                    </ScrollView>
+                )
             } else {
-                return userEvents.map((event, index) => (
-                    <View key={index} style={styles.eventContainer}>
-                        <View style={styles.eventInfoContainer}>
-                            <Text>{event.eventName}</Text>
-                            <Text>Start: {event.startDate}</Text>
-                            <Text>End: {event.endDate}</Text>
-                        </View>
-                    </View>
-                ));
+                return (
+                    <ScrollView style={styles.scrollViewContainer} contentContainerStyle={styles.scrollViewContent}>
+                        {userEvents.map((event, index) => (
+                            <View key={index} style={styles.eventContainer}>
+                                <View style={styles.eventInfoContainer}>
+                                    <Text>{event.eventName}</Text>
+                                    <Text>Start: {event.startDate}</Text>
+                                    <Text>End: {event.endDate}</Text>
+                                </View>
+                            </View>
+                        ))}
+                    </ScrollView>
+                )
             } 
         } else {
             return (
-                <View>
-                    <Text>User has no scheduled events at this time!</Text>
+                <View style={styles.noEventsContainer}>
+                    <Text style={styles.noEventsText}>No scheduled events at this time!</Text>
                 </View>
             );
         }
     };
 
     return (
-        <View>
-            <Button
-                title="Show All Events"
-                onPress={() => {
-                    setShowAllEvents(true)
-                    setSelectedDay(null)
-                }}
-            />
+        <View style={styles.container}>
+            {selectedDay !== null ? (
+                <Button
+                    title="Show All Events"
+                    onPress={() => {
+                        setShowAllEvents(true)
+                        setSelectedDay(null)
+                    }}
+                />
+            ) : (
+                null
+            )}
             <Calendar
                     style={{
                         borderWidth: 1,
@@ -148,14 +159,47 @@ function UserAvailability ({ route, navigation }) {
 }
 
 const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#fff',
+        alignItems: 'center',
+    },
+    scrollViewContainer: {
+        width: '95%',
+    },
+    scrollViewContent: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingBottom: '15%',
+    },
+    noEventsContainer: {
+        alignItems: 'center',
+        width: '90%',
+        justifyContent: 'center',
+        backgroundColor: '#fff',
+        padding: 20,
+        marginTop: 10,
+        borderRadius: 10,
+        borderWidth: 1,
+        borderColor: 'gray',
+    },
+    noEventsText: {
+        fontSize: 16,
+        color: '#555',
+    },
     eventContainer: {
         flexDirection: 'row',
         alignItems: 'center',
+        width: '95%',
         marginBottom: 10,
+        backgroundColor: '#fff',
+        padding: 20,
+        borderRadius: 10,
+        borderWidth: 1,
+        borderColor: 'gray',
     },
     eventInfoContainer: {
         marginRight: 5,
-        padding: 5,
     },
 })
 

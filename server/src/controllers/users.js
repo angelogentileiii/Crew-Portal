@@ -188,7 +188,7 @@ const currentUser = async (req, res, next) => {
         const plainUser = currentUser.get({ plain: true });
 
         // console.log(currentUser)
-        console.log(plainUser)
+        console.log('WITHIN CURRENT USER:', plainUser)
 
         return res.status(200).json(plainUser);
     } catch (error) {

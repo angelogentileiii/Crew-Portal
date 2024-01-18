@@ -46,24 +46,29 @@ function HomeScreen() {
                         }} 
                         />
                     <Stack.Screen 
-                        name="ProductionDetails" 
+                        name="Production Details" 
                         component={ProductionDetails} 
                         options={{ 
-                            headerShown: true 
+                            headerShown: true,
+                            headerTitle: '',
+                            headerBackTitle: 'Productions'
                         }} 
                     />
                     <Stack.Screen
                         name="Availability"
                         component={UserAvailability}
                         options={{
-                            headerShown: true
+                            headerShown: true,
+                            headerBackTitle: 'Crew List'
                         }}
                     />
                     <Stack.Screen
                         name="Add Production"
                         component={AddProduction}
                         options={{
-                            headerShown: true
+                            headerShown: true,
+                            headerTitle: '',
+                            headerBackTitle: 'Productions'
                         }}
                     />
                 </>

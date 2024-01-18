@@ -37,8 +37,8 @@ function EventCalendar({ navigation, isModalVisible, setModalVisible }) {
         try {
             // let token = await SecureStore.getItemAsync('accessToken')
 
-            // const responseJSON = await fetchAuthWrapper(`http://192.168.1.156:5555/calendarEvents${endpoint}`, {
-            const responseJSON = await fetchAuthWrapper(`http://10.129.3.82:5555/calendarEvents${endpoint}`, {
+            const responseJSON = await fetchAuthWrapper(`http://192.168.1.156:5555/calendarEvents${endpoint}`, {
+            // const responseJSON = await fetchAuthWrapper(`http://10.129.3.82:5555/calendarEvents${endpoint}`, {
                 method: 'GET',
             })
 
@@ -82,8 +82,8 @@ function EventCalendar({ navigation, isModalVisible, setModalVisible }) {
                 if (returnedId) {
                     try {
                         // Send the event data to your backend
-                        // await fetchAuthWrapper(`http://192.168.1.156:5555/calendarEvents/`, {
-                        await fetchAuthWrapper('http://10.129.3.82:5555/calendarEvents/', {
+                        await fetchAuthWrapper(`http://192.168.1.156:5555/calendarEvents/`, {
+                        // await fetchAuthWrapper('http://10.129.3.82:5555/calendarEvents/', {
                             method: 'POST',
                             body: JSON.stringify({
                                 startDate,
@@ -115,8 +115,8 @@ function EventCalendar({ navigation, isModalVisible, setModalVisible }) {
         try {
             // console.log('WITHIN HANDLE DELETE', id)
             deleteEventsById(nativeId, 'Crew Calendar')
-            // await fetchAuthWrapper(`http://192.168.1.156:5555/calendarEvents/${id}`, {
-            await fetchAuthWrapper(`http://10.129.3.82:5555/calendarEvents/${id}`, {
+            await fetchAuthWrapper(`http://192.168.1.156:5555/calendarEvents/${id}`, {
+            // await fetchAuthWrapper(`http://10.129.3.82:5555/calendarEvents/${id}`, {
                 method: 'DELETE',
             })
             const updatedEvents = dbEvents.filter((event) => event.nativeCalId !== id)
@@ -172,57 +172,66 @@ function EventCalendar({ navigation, isModalVisible, setModalVisible }) {
                     return selectedDate >= eventStart && selectedDate <= eventEnd;
                 });
         
-                return filteredEvents.map((event, index) => (
-                    <View key={index} style={styles.eventContainer}>
-                        <TouchableOpacity
-                            style={styles.deleteButton}
-                            underlayColor="#1E88E5" // Color when pressed
-                            onPress={() => {
-                                handleDeleteEvent(event.nativeCalId, event.id)
-                            }}
-                        >
-                            <Text style={styles.deleteButtonText}>X</Text>
-                        </TouchableOpacity>
-                        <View style={styles.eventInfoContainer}>
-                            <Text>{event.eventName}</Text>
-                            <Text>Start: {event.startDate}</Text>
-                            <Text>End: {event.endDate}</Text>
-                        </View>
-                    </View>
-                ));
+                return (
+                    <ScrollView 
+                    style={styles.scrollViewContainer}
+                    contentContainerStyle={styles.scrollViewContent}
+                    >
+                        {filteredEvents.map((event, index) => (
+                            <View key={index} style={styles.eventContainer}>
+                                <TouchableOpacity
+                                    style={styles.deleteButton}
+                                    underlayColor="#1E88E5" // Color when pressed
+                                    onPress={() => {
+                                        handleDeleteEvent(event.nativeCalId, event.id)
+                                    }}
+                                >
+                                    <Text style={styles.deleteButtonText}>X</Text>
+                                </TouchableOpacity>
+                                <View style={styles.eventInfoContainer}>
+                                    <Text>{event.eventName}</Text>
+                                    <Text>Start: {event.startDate}</Text>
+                                    <Text>End: {event.endDate}</Text>
+                                </View>
+                            </View>
+                        ))}
+                    </ScrollView>
+                )
             } else {
-                return dbEvents.map((event, index) => (
-                    <View key={index} style={styles.eventContainer}>
-                        <TouchableOpacity
-                            style={styles.deleteButton}
-                            underlayColor="#1E88E5" // Color when pressed
-                            onPress={() => {
-                                handleDeleteEvent(event.nativeCalId, event.id)
-                            }}
-                        >
-                            <Text style={styles.deleteButtonText}>X</Text>
-                        </TouchableOpacity>
-                        <View style={styles.eventInfoContainer}>
-                            <Text>{event.eventName}</Text>
-                            <Text>Start: {event.startDate}</Text>
-                            <Text>End: {event.endDate}</Text>
-                        </View>
-                    </View>
-                ));
+                return (
+                    <ScrollView 
+                    style={styles.scrollViewContainer}
+                    contentContainerStyle={styles.scrollViewContent}
+                    >
+                        {dbEvents.map((event, index) => (
+                            <View key={index} style={styles.eventContainer}>
+                                <TouchableOpacity
+                                    style={styles.deleteButton}
+                                    underlayColor="#1E88E5" // Color when pressed
+                                    onPress={() => {
+                                        handleDeleteEvent(event.nativeCalId, event.id)
+                                    }}
+                                >
+                                    <Text style={styles.deleteButtonText}>X</Text>
+                                </TouchableOpacity>
+                                <View style={styles.eventInfoContainer}>
+                                    <Text style={{fontWeight: 'bold'}}>{event.eventName}</Text>
+                                    <Text>Start: {event.startDate.split('T')[0]}</Text>
+                                    <Text>End: {event.endDate.split('T')[0]}</Text>
+                                </View>
+                            </View>
+                        ))}
+                    </ScrollView>
+                )
             } 
         } else {
             return (
-                <View>
-                    <Text>User has no scheduled events at this time!</Text>
+                <View style={styles.noEventsContainer}>
+                    <Text style={styles.noEventsText}>No scheduled events at this time</Text>
                 </View>
             );
         }
     };
-
-    // const removeCalendar = () => {
-    //     setDBEvents([])
-    //     deleteCalendar();
-    // }
 
     return (
         <View style={styles.container}>
@@ -259,38 +268,7 @@ function EventCalendar({ navigation, isModalVisible, setModalVisible }) {
                         setSelectedDay(day.dateString)
                     }}
                 />
-                <ScrollView 
-                    style={styles.scrollView}
-                    contentContainerStyle={styles.scrollViewContent}
-                    >
-                
-                    {displayEvents()}
-
-                {/* User's Events */}
-                {/* {(dbEvents.length > 0) ? dbEvents.map((event, index) => {
-                    return (
-                        <View key={index} style={styles.eventContainer}>
-                            <TouchableOpacity
-                                style={styles.deleteButton}
-                                underlayColor="#1E88E5" // Color when pressed
-                                onPress={() => {
-                                    handleDeleteEvent(event.nativeCalId, event.id)
-                                }}
-                            >
-                                <Text style={styles.deleteButtonText}>X</Text>
-                            </TouchableOpacity>
-                            <View style={styles.eventInfoContainer}>
-                                <Text>{event.eventName}</Text>
-                                <Text>Start: {event.startDate}</Text>
-                                <Text>End: {event.endDate}</Text>
-                            </View>
-                            
-                        </View>
-                    )
-                }): (null)} */}
-
-            </ScrollView>
-
+                {displayEvents()}
             <AddEventModal
                 isVisible={isModalVisible}
                 onClose={() => setModalVisible(false)}
@@ -303,47 +281,45 @@ function EventCalendar({ navigation, isModalVisible, setModalVisible }) {
 const styles = StyleSheet.create({
     container: {
         flexGrow: 1,
-        justifyContent: 'center',
         alignItems: 'center',
-        padding: 20,
         backgroundColor: '#fff',
     },
-    scrollView: {
+    scrollViewContainer: {
+        flex: 1,
         width: '95%',
+        backgroundColor: '#fff'
     },
     scrollViewContent: {
         alignItems: 'center',
-        justifyContent: 'center',
-        paddingEnd: '10%',
-        paddingTop: '3%',
-        paddingBottom: '9%',
-    },
-    addEventButton: {
-        position: 'absolute',
-        bottom: 20,
-        right: 20,
-        backgroundColor: '#2196F3',
-        borderRadius: 50,
-        width: 50,
-        height: 50,
-        justifyContent: 'center',
-        alignItems: 'center',
-        elevation: 10,
-    },
-    aeButtonText: {
-        color: '#fff',
-        textAlign: 'center',
-        fontWeight: 'bold',
-        fontSize: 36,
     },
     eventContainer: {
         flexDirection: 'row',
         alignItems: 'center',
+        width: '95%',
         marginBottom: 10,
+        backgroundColor: '#fff',
+        padding: 20,
+        borderRadius: 10,
+        borderWidth: 1,
+        borderColor: 'gray',
     },
     eventInfoContainer: {
         marginRight: 5,
-        padding: 5,
+    },
+    noEventsContainer: {
+        alignItems: 'center',
+        width: '90%',
+        justifyContent: 'center',
+        backgroundColor: '#fff',
+        padding: 20,
+        marginTop: 10,
+        borderRadius: 10,
+        borderWidth: 1,
+        borderColor: 'gray',
+    },
+    noEventsText: {
+        fontSize: 16,
+        color: '#555',
     },
     deleteButton: {
         backgroundColor: '#2196F3',
