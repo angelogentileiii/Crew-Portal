@@ -8,94 +8,183 @@ import useFetchAuthWrapper from '../components/fetchAuthWrapper';
 function JobBoard({ navigation }){
     const [productions, setProductions] = useState([]);
     const [filteredProductions, setFilteredProductions] = useState([]);
+    const [selectedProductionId, setSelectedProductionId] = useState(null);
     const [searchText, setSearchText] = useState('');
     const [isModalVisible, setModalVisible] = useState(false);
 
     const authContext = useContext(AuthContext)
-    const { attemptLogout, checkAccessToken, currentUserType } = authContext
+    const { checkAccessToken, currentUserType, currentUser } = authContext
 
     // Using the custom fetch wrapper
     const fetchAuthWrapper = useFetchAuthWrapper({ navigation });
 
-    const fetchData = async () => {
+    console.log('WITHIN JOBBOARD: ', currentUser)
 
+    const fetchData = async () => {
         try {
-            await checkAccessToken()
-            // const responseJSON = await fetchAuthWrapper('http://192.168.1.156:5555/productions', {
-            const responseJSON = await fetchAuthWrapper('http://10.129.3.82:5555/productions', {
+            const response = await fetchAuthWrapper('http://192.168.1.156:5555/productions', {
+            // const response = await fetchAuthWrapper('http://10.129.3.82:5555/productions', {
                 method: 'GET',
             });
 
-            setProductions(responseJSON);
+            console.log('WITHIN CREW FETCH JSON:', response);
+
+            setProductions(response);
         } catch (error) {
             console.error('Error occurred while fetching productions:', error);
         }
     };
 
-    useEffect(() => {
-        const filteredProdData = productions.filter((production) =>
-            // const { name, type, location, unionProduction } = production
+    const fetchPCProductions = async () => {
 
-            production.name.toLowerCase().includes(searchText.toLowerCase()) ||
-            production.type.toLowerCase().includes(searchText.toLowerCase()) ||
-            production.location.toLowerCase().includes(searchText.toLowerCase())
-        );
-        setFilteredProductions(filteredProdData)
-    }, [productions, searchText])
+        // console.log('WITHIN PC FETCH: ', currentUser.username)
+        const pcUsername = await currentUser.username
 
+        try {
+            const response = await fetchAuthWrapper(`http://192.168.1.156:5555/productions/byCompany/${pcUsername}`, {
+            // const response = await fetchAuthWrapper(`http://10.129.3.82:5555/productions/byCompany/${pcUsername}`, {
+                method: 'GET',
+            })
+
+            // console.log('WITHIN FETCH PC JSON:', response);
+            if (!response.message) {
+                setProductions(response);
+
+            }
+        }
+        catch (error) {
+            console.error('Error while fetching your productions', error)
+        }
+    };
+    
     useEffect(() => {
         const screenFocus = navigation.addListener('focus', () => {
-            fetchData();
+
+            // console.log('WITHIN USEFFECT ON JOB BOARD: ', currentUser)
+
+            if (currentUserType === 'crew' && currentUser.username) {
+                fetchData();
+            } else if (currentUser.username) {
+                fetchPCProductions();
+            }
         });
 
         // Cleanup the listener when the component is unmounted
         return () => {
             screenFocus();
         };
-    }, [navigation]);
+    }, [navigation, currentUser.username, currentUserType]);
 
-    const productionInfo = filteredProductions.map((production) => {
+
+    useEffect(() => {
+        if (currentUserType === 'crew' && currentUser.username) {
+            fetchData();
+        } else if (currentUser.username) {
+            fetchPCProductions();
+        }
+    }, [currentUser, currentUserType])
+
+    const removeProduction = async (id) => {
+        try {
+            await fetchAuthWrapper(`http://10.129.3.82:5555/productions/${id}`, {
+                method: 'DELETE'
+            })
+            
+            // If the deletion is successful, update the state with the new data
+            const updatedProductions = productions.filter((production) => production.id !== id);
+
+            console.log('DELETED!')
+            setProductions(updatedProductions);
+            // setFilteredProductions(updatedProductions)
+        }
+        catch (error) {
+            console.error('Error occurred while deleting production:', error);
+        }
+    }
+
+    console.log('SEARCH TEXT: ', searchText)
+
+    useEffect(() => {
+        // Filter productions based on search text
+        const filteredProdData = productions.filter((production) =>
+            production.name.toLowerCase().includes(searchText.toLowerCase()) ||
+            production.type.toLowerCase().includes(searchText.toLowerCase()) ||
+            production.location.toLowerCase().includes(searchText.toLowerCase())
+        );
+        setFilteredProductions(filteredProdData);
+    }, [searchText, productions]);
+
+    const productionInfo = filteredProductions?.map((production) => {
         const { name, type, location, unionProduction, id } = production
+
+        const blurbDescription = "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
 
         return (
             <Card key={id} style={styles.cards}>
-                <Card.Title title={name} subtitle={location} />
-                    <Card.Content>
-                        <Text>{type}</Text>
-                        <Text>{unionProduction}</Text>
-                    </Card.Content>
-                    <View style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
+                <Card.Title 
+                    title={name} 
+                    titleStyle={{fontWeight: 'bold'}}
+                    subtitle={location} 
+                    subtitleStyle={{fontStyle: 'italic'}}
+                />
+                <Card.Content>
+                    <Text style={styles.label}>Logline:</Text>
+                    <Text>{blurbDescription}</Text>
+                    
+                    <View style={styles.infoContainer}>
+                        <View style={styles.column}>
+                            <Text style={styles.label}>Format:</Text>
+                            <Text>{type}</Text>
+                        </View>
+                        <View style={styles.column}>
+                            <Text style={styles.label}>Crew Level:</Text>
+                            <Text>{unionProduction ? 'Union' : 'Non-Union'}</Text>
+                        </View>
+                    </View>
+                </Card.Content>
 
-                        {/* Quick Apply Button for Crew Only */}
-                        {currentUserType === 'crew' ? (
-                            <Card.Actions>
-                                <TouchableOpacity
-                                    style={styles.cardButton}
-                                    underlayColor="#1E88E5" // Color when pressed
-                                    onPress={() => {
-                                        setModalVisible(true)
-                                    }}
-                                >
-                                    <Text style={styles.cardButtonText}>Quick Apply</Text>
-                                </TouchableOpacity>
-                            </Card.Actions>
-                        ): (
-                            null
-                        )}
-
-                        {/* Details Button */}
+                <View style={styles.actionsContainer}>
+                    {/* Quick Apply Button for Crew Only */}
+                    {currentUserType === 'crew' ? (
                         <Card.Actions>
                             <TouchableOpacity
                                 style={styles.cardButton}
                                 underlayColor="#1E88E5" // Color when pressed
                                 onPress={() => {
-                                    navigation.push('ProductionDetails', {id: id})
+                                    setModalVisible(true)
                                 }}
                             >
-                                <Text style={styles.cardButtonText}>View Details</Text>
+                                <Text style={styles.cardButtonText}>Quick Apply</Text>
                             </TouchableOpacity>
                         </Card.Actions>
-                    </View>
+                    ): (
+                        <Card.Actions>
+                            <TouchableOpacity
+                                style={styles.cardButton}
+                                underlayColor="#1E88E5" // Color when pressed
+                                onPress={() => {
+                                    setModalVisible(true)
+                                    setSelectedProductionId(id)
+                                }}
+                            >
+                                <Text style={styles.cardButtonText}>Remove Production</Text>
+                            </TouchableOpacity>
+                        </Card.Actions>
+                    )}
+
+                    {/* Details Button */}
+                    <Card.Actions>
+                        <TouchableOpacity
+                            style={styles.cardButton}
+                            underlayColor="#1E88E5" // Color when pressed
+                            onPress={() => {
+                                navigation.push('Production Details', {id: id})
+                            }}
+                        >
+                            <Text style={styles.cardButtonText}>View Details</Text>
+                        </TouchableOpacity>
+                    </Card.Actions>
+                </View>
             </Card>
         )
     })
@@ -117,22 +206,52 @@ function JobBoard({ navigation }){
                 {productionInfo}
             </ScrollView>
 
-            <Modal
-                visible={isModalVisible}
-                animationType='none'
-                transparent={true}
-            >
-                <View style={styles.modalContainer}>
-                    <View style={styles.modalContent}>
-                        <Text>Application Sent!</Text>
+            {currentUserType === 'crew' ? (
+                <Modal
+                    visible={isModalVisible}
+                    animationType='none'
+                    transparent={true}
+                >
+                    <View style={styles.modalContainer}>
+                        <View style={styles.modalContent}>
+                            <Text style={{fontSize: 16}}>Application Sent!</Text>
+                        </View>
+                        <View style={styles.secondaryContent}>
+                            <TouchableOpacity onPress={() => setModalVisible(false)}>
+                                <Text style={styles.secondaryButtonText}>Return</Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
-                    <View style={styles.secondaryContent}>
-                        <TouchableOpacity onPress={() => setModalVisible(false)}>
-                            <Text style={styles.secondaryButtonText}>Return</Text>
-                        </TouchableOpacity>
+                </Modal>
+            ) : (
+                <Modal
+                    visible={isModalVisible}
+                    animationType='none'
+                    transparent={true}
+                >
+                    <View style={styles.modalContainer}>
+                        <View style={styles.modalContent}>
+                            <Text>Confirm deletion of Production</Text>
+                        </View>
+                        <View style={styles.secondaryContent}>
+                            <TouchableOpacity onPress={() => {
+                                removeProduction(selectedProductionId)
+                                setModalVisible(false)
+                            }}>
+                                <Text style={{...styles.secondaryButtonText, color: 'red'}}>Delete</Text>
+                            </TouchableOpacity>
+                        </View>
+                        <View style={styles.secondaryContent}>
+                            <TouchableOpacity onPress={() => {
+                                setModalVisible(false)
+                            }}>
+                                <Text style={styles.secondaryButtonText}>Cancel</Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
-                </View>
-            </Modal>
+                </Modal>
+            )}
+            
         </View>
     )
 }
@@ -141,24 +260,24 @@ const styles = StyleSheet.create({
     container: {
         flexGrow: 1,
         backgroundColor: '#fff',
+        // backgroundColor: 'green',
         alignItems: 'center',
         justifyContent: 'center',
     },
     scrollContainer: {
         flex: 1,
         width: '100%',
-        // paddingVertical: 20,
-        marginBottom: '.25%',
-        // paddingBottom: 20,
+        // marginBottom: '.25%',
         backgroundColor: '#fff',
         // backgroundColor: 'blue',
     },
     input: {
         borderWidth: 1,
         borderColor: '#ccc',
-        padding: 12,
-        marginVertical: '5%',
-        width: 250,
+        padding: 10,
+        marginTop: '5%',
+        marginBottom: '5%',
+        width: '95%',
         borderRadius: 8, // Add rounded corners
         backgroundColor: '#fff',
         // backgroundColor: 'yellow'
@@ -217,7 +336,6 @@ const styles = StyleSheet.create({
         width: '65%',
         backgroundColor: '#fff',
         borderRadius: 15,
-        // padding: 20,
         marginTop: '2%',
         alignItems: 'center',
         shadowColor: '#000',
@@ -233,8 +351,39 @@ const styles = StyleSheet.create({
         color: "#2196F3",
         textAlign: 'center',
         fontWeight: '600',
-        fontSize: 20,
+        fontSize: 16,
         padding: 7.5,
+    },
+    column: {
+        width: '60%',
+        paddingRight: 10,
+        paddingBottom: 5,
+    },
+    infoContainer: {
+        flexDirection: 'row',
+        // justifyContent: 'space-between',
+    },
+    label: {
+        fontWeight: 'bold',
+        marginTop: 10,
+        marginBottom: 5,
+        color: '#555',
+    },
+    actionsContainer: {
+        flexDirection: 'row',
+        justifyContent: 'flex-end',
+        marginTop: 10,
+    },
+    cardButton: {
+        borderWidth: 1,
+        borderRadius: 8,
+        borderColor: '#777',
+        padding: 10,
+        marginLeft: 10,
+        backgroundColor: '#fff',
+    },
+    cardButtonText: {
+        color: '#777',
     },
 });
 

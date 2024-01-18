@@ -101,22 +101,23 @@ const deleteProduction = async (req, res, next) => {
 const getProductionByPC = async (req, res, next) => {
     try {
         const productionCompany = await ProductionCompany.findOne({
-            where: {name: req.params.pcName},
+            where: {username: req.params.pcName},
             attributes: {exclude: ['createdAt', 'updatedAt', 'password']}
         });
-
-        console.log(productionCompany.dataValues)
 
         if (!productionCompany) {
             return res.status(404).json({message: "Production company not found"})
         }
+
+        console.log('WITHIN GET PRODUCTIONS: ', productionCompany.dataValues)
+
         const productions = await Production.findAll({
             where: {productionCompanyId: productionCompany.id},
         })
 
         const productionData = productions.map(production => production.get({ plain: true }));
 
-        console.log(productionData)
+        console.log('WITHIN GET PRODUCTIONS: ', productionData)
 
         return res.status(200).json(productionData)
     }

@@ -20,7 +20,7 @@ function AddProduction ({ navigation }) {
 
     const fetchAuthWrapper = useFetchAuthWrapper({ navigation });
 
-    console.log('WITHIN ADD PRODUCTION: ', currentUser)
+    // console.log('WITHIN ADD PRODUCTION: ', currentUser)
 
     const productionTypes = [
         { value: 'Commercial', key: 'Commercial' },
@@ -81,7 +81,7 @@ function AddProduction ({ navigation }) {
         let location = `${selectedCity}, ${selectedState}`
         setValue('location', location)
 
-        console.log('WITHIN FIELD CHANGE', name, text)
+        // console.log('WITHIN FIELD CHANGE', name, text)
 
     }, [setValue, selectedCity, selectedState])
 
@@ -94,10 +94,10 @@ function AddProduction ({ navigation }) {
     const addProduction = async ( formData ) => {
         try {
 
-            console.log('FORM DATA BEFORE SUBMISSION:', formData);
+            // console.log('FORM DATA BEFORE SUBMISSION:', formData);
 
-            // const responseJSON = await fetchAuthWrapper('http://192.168.1.156:5555/productions', {
-            const responseJSON = await fetchAuthWrapper('http://10.129.3.82:5555/productions', {
+            const responseJSON = await fetchAuthWrapper('http://192.168.1.156:5555/productions', {
+            // const responseJSON = await fetchAuthWrapper('http://10.129.3.82:5555/productions', {
                 method: 'POST',
                 body: JSON.stringify({
                     ...formData,
@@ -125,7 +125,7 @@ function AddProduction ({ navigation }) {
             
             await addProduction(formData)
             
-            navigation.navigate('All Productions');
+            navigation.navigate('Productions');
         }
         catch (error) {
             console.warn('Error occured on Submit: ', error)
@@ -142,7 +142,7 @@ function AddProduction ({ navigation }) {
     return (
         <View style={styles.container}>
             <ScrollView style={styles.form} contentContainerStyle={styles.formContent}>
-            {/* <Text style={styles.title}>Add Production Information</Text> */}
+            <Text style={styles.title}>Production Information</Text>
             <View style={styles.checkboxContainer}>
                 <Text style={styles.checkboxLabel}>Production Contract: </Text>
                     <TouchableOpacity
@@ -236,6 +236,7 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: 18,
+        fontWeight: 'bold',
         marginBottom: 20,
         marginTop: 20,
     },

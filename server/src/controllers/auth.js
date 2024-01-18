@@ -20,6 +20,8 @@ const signupUser = async (req, res, next) => {
             return modelAttributes.includes(key)
         })
 
+        const { userType } = req.body;
+
         // New Object with only valid keys
         const newUser = validKeys.reduce((accum, key) => {
             accum[key] = req.body[key]
@@ -37,7 +39,8 @@ const signupUser = async (req, res, next) => {
                         "userType": userType
                     },
                     process.env.ACCESS_TOKEN_SECRET,
-                    { expiresIn: '120s'}
+                    // { expiresIn: '15m'}
+                    { expiresIn: '1d' }
                 );
                 const refreshToken = jwt.sign(
                     { 
@@ -109,7 +112,8 @@ const loginUser = async (req, res, next) => {
                 "userType": userType
             },
             process.env.ACCESS_TOKEN_SECRET,
-            { expiresIn: '15m'}
+            // { expiresIn: '15m'}
+            { expiresIn: '1d' }
         );
 
         console.log('ACCESS TOKEN LOGIN:', accessToken)
@@ -155,6 +159,8 @@ const signupPC = async (req, res, next) => {
             return modelAttributes.includes(key)
         })
 
+        const { userType } = req.body;
+
         const newPC = validKeys.reduce((accum, key) => {
             accum[key] = req.body[key]
             return accum
@@ -173,7 +179,8 @@ const signupPC = async (req, res, next) => {
                         "userType": userType,
                     },
                     process.env.ACCESS_TOKEN_SECRET,
-                    { expiresIn: '120s'}
+                    // { expiresIn: '15m'}
+                    { expiresIn: '1d' }
                 );
 
                 const refreshToken = jwt.sign(
@@ -252,7 +259,8 @@ const loginPC = async (req, res, next) => {
                 "userType": userType
             },
             process.env.ACCESS_TOKEN_SECRET,
-            { expiresIn: '15m'}
+            // { expiresIn: '15m'}
+            { expiresIn: '1d' }
         );
 
         // create the refresh token (later expiry)
@@ -304,7 +312,8 @@ const refreshTokens = async (req, res, next) => {
                 userType: decoded.userType,
             },
             process.env.ACCESS_TOKEN_SECRET,
-            { expiresIn: '15m' } // Set your desired expiry time for the new access token
+            // { expiresIn: '15m' } // Set your desired expiry time for the new access token
+            { expiresIn: '1d' }
         );
 
         // Respond with the new access token

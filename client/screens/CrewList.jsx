@@ -6,6 +6,7 @@ import AvailabilitySelector from "../components/AvailabilitySelector";
 import { AuthContext } from '../contextProviders/AuthContext';
 import useFetchAuthWrapper from "../components/fetchAuthWrapper";
 import CrewCard from "../components/CrewCard";
+import CrewListModal from "../components/CrewListModal";
 
 function CrewList ({ navigation }) {
     const [crewList, setCrewList] = useState([])
@@ -27,8 +28,8 @@ function CrewList ({ navigation }) {
     const fetchUsers = async () => {
         try {
             await checkAccessToken()
-            // const allUsers = await fetchAuthWrapper('http://192.168.1.156:5555/users', {
-            const allUsers = await fetchAuthWrapper('http://10.129.3.82:5555/users', {
+            const allUsers = await fetchAuthWrapper('http://192.168.1.156:5555/users', {
+            // const allUsers = await fetchAuthWrapper('http://10.129.3.82:5555/users', {
                 method: 'GET'
             })
 
@@ -61,8 +62,8 @@ function CrewList ({ navigation }) {
     }
 
     const handleDateSearch = async (start, end) => {
-        // const URL = `http://192.168.1.156:5555/users/availableUsers`
-        const URL = 'http://10.129.3.82:5555/users/availableUsers'
+        const URL = `http://192.168.1.156:5555/users/availableUsers`
+        // const URL = 'http://10.129.3.82:5555/users/availableUsers'
 
         try {
             if (start && !end) {
@@ -136,10 +137,23 @@ function CrewList ({ navigation }) {
                 ) : startDate !== null ? (
                     <Text style={styles.dateTimePickerButtonText}>Selected Date: {formatDate(startDate).toString()}</Text>
                 ) : (
-                    <Text style={styles.dateTimePickerButtonText}>Search by Date</Text>
+                    <Text style={styles.dateTimePickerButtonText}>Search by Availability</Text>
                 )}
             </TouchableOpacity>
 
+            <CrewListModal 
+                startDate={startDate}
+                setStartDate={setStartDate}
+                endDate={endDate}
+                setEndDate={setEndDate}
+                isModalVisible={isModalVisible} 
+                setModalVisible={setModalVisible}
+                isDatePickerVisible={isDatePickerVisible}
+                setDatePickerVisible={setDatePickerVisible}
+                handleDateSearch={handleDateSearch} 
+                handleStartDateSelected={handleStartDateSelected}
+                formatDate={formatDate}
+            />
 
             {startDate !== null ? (
                 // Add Reset button here
@@ -153,90 +167,7 @@ function CrewList ({ navigation }) {
                 null 
             )}
 
-            <Modal
-                visible={isModalVisible}
-                animationType="slide"
-                transparent={true}
-            >
-                <View style={styles.modalContainer}>
-
-                    {/* Check box for single date vs. date range */}
-                    <View style={styles.modalContent}>
-                        <View style={styles.checkboxContainer}>
-                                <TouchableOpacity
-                                    style={[styles.checkBox, !isDateRangeSelected ? styles.activeCheckBox : null]}
-                                    onPress={() => setDateRangeSelected(false)}
-                                >
-                                </TouchableOpacity>
-                            <Text>Single Day</Text>
-                                <TouchableOpacity
-                                    style={[styles.checkBox, isDateRangeSelected ? styles.activeCheckBox: null]}
-                                    onPress={() => setDateRangeSelected(true)}
-                                >
-                                </TouchableOpacity>
-                            <Text>Range of Dates</Text>
-                        </View>
-
-                        {isDateRangeSelected ? (
-                            // multiple date search
-                            <>
-                                <AvailabilitySelector
-                                    onStartDateSelected={(date) => setStartDate(date)}
-                                    onEndDateSelected={(date) => setEndDate(date)}
-                                />
-                                {startDate !== null && endDate !== null && (
-                                    <TouchableOpacity style={styles.dateTimePickerButton} onPress={() => {
-                                        handleDateSearch(startDate, endDate)
-                                        setModalVisible(false) 
-                                    }}>
-                                        <Text style={styles.dateTimePickerButtonText}>Search Date Range</Text>
-                                    </TouchableOpacity>
-                                )}
-                            </>
-                        ) : (
-                            <>
-                                {/* Singular Date Search */}
-                                <TouchableOpacity
-                                    style={styles.dateTimePickerButton}
-                                    onPress={() => setDatePickerVisible(true)}
-                                >
-                                    {(startDate) ? (
-                                        <Text style={styles.dateTimePickerButtonText}>{formatDate(startDate).toString()}</Text>
-                                    ) : (
-                                        <Text style={styles.dateTimePickerButtonText}>Choose Date</Text>
-                                    )}
-                                </TouchableOpacity>
-                                {startDate !== null && (
-                                    <TouchableOpacity style={styles.searchButton} onPress={() => {
-                                        handleDateSearch(startDate)
-                                        setModalVisible(false)
-                                        }}>
-                                        <Text style={styles.dateTimePickerButtonText}>Search</Text>
-                                    </TouchableOpacity>
-                                )}
-                                <DateTimePickerModal
-                                    isVisible={isDatePickerVisible}
-                                    mode="date"
-                                    display="inline"
-                                    locale="en-ES"
-                                    minimumDate={new Date()}
-                                    onConfirm={handleStartDateSelected}
-                                    onCancel={() => setDatePickerVisible(false)}
-                                />
-                            </>
-                        )}
-
-                    </View>
-
-                    {/* Cancel Button */}
-                    <View style={styles.secondaryContent}>
-                        <TouchableOpacity style={styles.secondaryButton} onPress={() => setModalVisible(false)}>
-                            <Text style={styles.secondaryButtonText}>Cancel</Text>
-                        </TouchableOpacity>
-                    </View>
-                </View>
-                
-            </Modal>
+            
             <ScrollView style={styles.scrollContainer}>
                 {crewInfo}
             </ScrollView>
