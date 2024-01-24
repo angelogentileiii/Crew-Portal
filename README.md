@@ -150,8 +150,18 @@ _If you'd like a visualization of your PostgreSQL database, I highly recommend u
 - PostgreSQL
 
   
-## Contributing
+## Contributions
 Contributions welcome! Feel free to open issues or create pull requests.
+
+Utilized/modified open-source work from:
+  - AtilaDev (Leandro Favre & Aman Mittal): [useCalendar](https://github.com/AtilaDev-team/useCalendar)
+
+  - Matteo Mazzarolo: [modal datetime picker](https://github.com/mmazzarolo/react-native-modal-datetime-picker)
+
+  - Danish Amin Dar: [native dropdown select list](https://github.com/danish1658/react-native-dropdown-select-list)
+
+
+
 
 ## License
 This project is licensed under the [MIT License](https://opensource.org/license/mit/).
