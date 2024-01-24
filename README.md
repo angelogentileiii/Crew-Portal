@@ -134,7 +134,8 @@ To start the Express server:
     ```
     
 This command will launch the server, making it accessible for handling authentication and database operations.
-_If you'd like a visualization of your PostgreSQL databasem, I highly recommend using PSQL. Try [this](https://www.freecodecamp.org/news/manage-postgresql-with-psql/)._
+
+_If you'd like a visualization of your PostgreSQL database, I highly recommend using PSQL. Try [this](https://www.freecodecamp.org/news/manage-postgresql-with-psql/)._
 
 
 ## Technologies Used
