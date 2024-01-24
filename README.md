@@ -154,4 +154,4 @@ _If you'd like a visualization of your PostgreSQL database, I highly recommend u
 Contributions welcome! Feel free to open issues or create pull requests.
 
 ## License
-This project is licensed under the MIT License.
+This project is licensed under the [MIT License](https://opensource.org/license/mit/).
