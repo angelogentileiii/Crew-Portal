@@ -1,7 +1,10 @@
 # Crew Portal
 
-## Overview
-Crew Portal is a mobile application developed in React Native with Express.js, utilizing JWT Tokens for authentication, and PostgreSQL as the database. It serves as a communication platform for film technicians to interact with production companies, facilitating ease in scheduling and providing information about ongoing productions.
+<p align='center'>
+  <img src='https://github.com/angelogentileiii/Crew_Portal/assets/140743863/61ef39f5-65b7-4f8a-81fd-8a33071c0a57) alt='Crew Portal Logo' />
+</p>
+
+A mobile application developed in React Native with Express.js, utilizing JWT Tokens for authentication, and PostgreSQL as the database. It serves as a communication platform for film technicians to interact with production companies, facilitating ease in scheduling and providing information about ongoing productions.
 
 ## Table of Contents
 - [Getting Started](#getting-started)
