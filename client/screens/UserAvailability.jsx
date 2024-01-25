@@ -13,10 +13,13 @@ function UserAvailability ({ route, navigation }) {
 
     const fetchAuthWrapper = useFetchAuthWrapper({ navigation })
 
+    const URL = 'http://192.168.1.156:5555'
+    // const URL = 'http://10.129.3.82:5555'
+
+
     const fetchUserEvents = async () => {
         try {
-            const responseJSON = await fetchAuthWrapper(`http://192.168.1.156:5555/calendarEvents/user/${id}`, {
-            // const responseJSON = await fetchAuthWrapper(`http://10.129.3.82:5555/calendarEvents/user/${id}`, {
+            const responseJSON = await fetchAuthWrapper(URL + `/calendarEvents/user/${id}`, {
                 method: 'GET',
             })
 

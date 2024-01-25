@@ -1,5 +1,5 @@
 import React, { useEffect, useCallback, useContext, useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Vibration } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Vibration, Image, ScrollView } from 'react-native';
 import { useForm } from 'react-hook-form'
 
 import { AuthContext } from '../contextProviders/AuthContext';
@@ -46,63 +46,73 @@ function Login({ navigation }) {
 
   return (
       <View style={styles.container}>
+        <Image 
+          source={require('../assets/CP_Logo.png')} 
+          style={styles.appLogo}
+        />
+        <ScrollView 
+          style={styles.form} 
+          contentContainerStyle={styles.formContent}
+          // automaticallyAdjustKeyboardInsets={true}
+        >
         <Text style={styles.title}>Login</Text>
         {/* Toggle for choosing user type */}
-        <View style={styles.checkboxContainer}>
-            <Text style={styles.checkboxLabel}>Account Type: </Text>
-                <TouchableOpacity
-                    style={[styles.checkBox, userType === 'crew' ? styles.activeCheckBox : null]}
-                    onPress={() => setUserType('crew')}
-                >
-                </TouchableOpacity>
-            <Text>Crew</Text>
-                <TouchableOpacity
-                    style={[styles.checkBox, userType === 'productionCompany' ? styles.activeCheckBox : null]}
-                    onPress={() => setUserType('productionCompany')}
-                >
-                </TouchableOpacity>
-            <Text>Production Company</Text>
-        </View>
-        <TextInput
-        style={styles.input}
-        placeholder='Username'
-        placeholderTextColor='#000'
-        autoCapitalize="none"
-        onChangeText={onFieldChange('username')}
-        />
-        <TextInput
-        style={styles.input}
-        placeholder='Password'
-        placeholderTextColor='#000'
-        autoCapitalize="none"
-        onChangeText={onFieldChange('password')}
-        // secureTextEntry={true} 
-        />
-        {errorResponse ? (
-          <Text style={styles.errorMessage}>{errorResponse}</Text>
-        ): (
-          null
-        )}
-        <TouchableOpacity
-            style={styles.button}
-            underlayColor="#1E88E5" // Color when pressed
-            onPress={handleSubmit(onSubmit)}
-        >
-            <Text style={styles.buttonText}>Login</Text>
-        </TouchableOpacity>
-        <View style={styles.container2}>
-          <Text style={styles.title2}>New user?</Text>
+          <View style={styles.checkboxContainer}>
+              <Text style={styles.checkboxLabel}>Account Type: </Text>
+                  <TouchableOpacity
+                      style={[styles.checkBox, userType === 'crew' ? styles.activeCheckBox : null]}
+                      onPress={() => setUserType('crew')}
+                  >
+                  </TouchableOpacity>
+              <Text>Crew</Text>
+                  <TouchableOpacity
+                      style={[styles.checkBox, userType === 'productionCompany' ? styles.activeCheckBox : null]}
+                      onPress={() => setUserType('productionCompany')}
+                  >
+                  </TouchableOpacity>
+              <Text>Production Company</Text>
+          </View>
+          <TextInput
+          style={styles.input}
+          placeholder='Username'
+          placeholderTextColor='#000'
+          autoCapitalize="none"
+          onChangeText={onFieldChange('username')}
+          />
+          <TextInput
+          style={styles.input}
+          placeholder='Password'
+          placeholderTextColor='#000'
+          autoCapitalize="none"
+          onChangeText={onFieldChange('password')}
+          // secureTextEntry={true} 
+          />
+          {errorResponse ? (
+            <Text style={styles.errorMessage}>{errorResponse}</Text>
+          ): (
+            null
+          )}
           <TouchableOpacity
               style={styles.button}
               underlayColor="#1E88E5" // Color when pressed
-              onPress={() => {
-                handleSubmit(onSubmit)
-                navigation.navigate('SignUp')
-              }}
+              onPress={handleSubmit(onSubmit)}
           >
-              <Text style={styles.buttonText}>Create Account</Text>
+              <Text style={styles.buttonText}>Login</Text>
           </TouchableOpacity>
-        </View>
+          <View style={styles.container2}>
+            <Text style={styles.title2}>New user?</Text>
+            <TouchableOpacity
+                style={styles.button}
+                underlayColor="#1E88E5" // Color when pressed
+                onPress={() => {
+                  handleSubmit(onSubmit)
+                  navigation.navigate('SignUp')
+                }}
+            >
+                <Text style={styles.buttonText}>Create Account</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
       </View>
   );
 }
@@ -112,12 +122,28 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     alignItems: 'center',
-    justifyContent: 'center',
+    // justifyContent: 'center',
   },
   container2: {
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  form: {
+    width: '100%',
+    flex: 1,
+    paddingHorizontal: 10,
+    paddingBottom: 10,
+  },
+  formContent: {
+      flexGrow: 1,
+      alignItems: 'center',
+  },
+  appLogo: {
+    width: 350,
+    height: 350,
+    marginBottom: -25,
+    marginTop: 10,
   },
   title: {
     fontSize: 18,

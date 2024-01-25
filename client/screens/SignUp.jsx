@@ -79,7 +79,11 @@ function SignUp ({ navigation }) {
 
     return (
         <View style={styles.container}>
-            <ScrollView style={styles.form} contentContainerStyle={styles.formContent}>
+            <ScrollView 
+                style={styles.form} 
+                contentContainerStyle={styles.formContent}
+                automaticallyAdjustKeyboardInsets={true}
+                >
                 <Text style={styles.title}>Create New Account</Text>
                 {/* Toggle for choosing user type */}
                 <View style={styles.checkboxContainer}>
@@ -274,7 +278,8 @@ const styles = StyleSheet.create({
     form: {
         width: '100%',
         flex: 1,
-        padding: 10,
+        paddingHorizontal: 10,
+        paddingBottom: 10,
     },
     formContent: {
         flexGrow: 1,

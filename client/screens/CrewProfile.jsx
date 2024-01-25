@@ -13,14 +13,17 @@ function CrewProfile ({ navigation }) {
 
     const fetchAuthWrapper = useFetchAuthWrapper({ navigation });
 
+    const URL = 'http://192.168.1.156:5555'
+    // const URL = 'http://10.129.3.82:5555'
+
+
     useEffect(() => {
         const fetchData = async () => {
             let user = await checkAccessToken()
             console.log('Check Access:', user)
 
             try {
-                const responseJSON = await fetchAuthWrapper('http://192.168.1.156:5555/users/currentUser', {
-                // const responseJSON = await fetchAuthWrapper(`http://10.129.3.82:5555/users/currentUser/`, {
+                const responseJSON = await fetchAuthWrapper(URL + `/users/currentUser/`, {
                     method: 'GET',
                 })
 
@@ -53,9 +56,9 @@ function CrewProfile ({ navigation }) {
     return (
         <View style={styles.container}>
             <Image 
-                    source={require('../img_assets/defaultProfileJPG.jpg')} 
-                    style={styles.profileImage}
-                />
+                source={require('../assets/defaultProfileJPG.jpg')} 
+                style={styles.profileImage}
+            />
             <Text style={styles.userName}>
                 {userData.firstName} {userData.lastName}
             </Text>
@@ -97,7 +100,7 @@ function CrewProfile ({ navigation }) {
                 underlayColor="#1E88E5"
                 onPress={() => {
                     attemptLogout()
-                    navigation.navigate('HomeScreen')
+                    navigation.navigate('Crew Portal')
                 }}
             >
                 <Text style={styles.buttonText}>Logout?</Text>

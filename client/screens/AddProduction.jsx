@@ -20,7 +20,8 @@ function AddProduction ({ navigation }) {
 
     const fetchAuthWrapper = useFetchAuthWrapper({ navigation });
 
-    // console.log('WITHIN ADD PRODUCTION: ', currentUser)
+    const URL = 'http://192.168.1.156:5555'
+    // const URL = 'http://10.129.3.82:5555'
 
     const productionTypes = [
         { value: 'Commercial', key: 'Commercial' },
@@ -93,11 +94,7 @@ function AddProduction ({ navigation }) {
 
     const addProduction = async ( formData ) => {
         try {
-
-            // console.log('FORM DATA BEFORE SUBMISSION:', formData);
-
-            const responseJSON = await fetchAuthWrapper('http://192.168.1.156:5555/productions', {
-            // const responseJSON = await fetchAuthWrapper('http://10.129.3.82:5555/productions', {
+            const responseJSON = await fetchAuthWrapper(URL + '/productions', {
                 method: 'POST',
                 body: JSON.stringify({
                     ...formData,

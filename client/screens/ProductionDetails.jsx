@@ -11,25 +11,28 @@ function ProductionDetail ({ route, navigation }) {
 
     const fetchAuthWrapper = useFetchAuthWrapper({ navigation });
 
+    const URL = 'http://192.168.1.156:5555'
+    // const URL = 'http://10.129.3.82:5555'
+
+
     const fetchProductionData = async () => {
         try {
-            const responseJSON = await fetchAuthWrapper(`http://192.168.1.156:5555/productions/${id}`, {
-            // const responseJSON = await fetchAuthWrapper(`http://10.129.3.82:5555/productions/${id}`, {
+            
+            const responseJSON = await fetchAuthWrapper(URL + `/productions/${id}`, {
                 method: 'GET',
             });
 
-            // console.log('AFTER PRODUCTIONS FETCH: ', responseJSON)
 
             if (responseJSON) {
                 try{
                     setProduction(responseJSON);
     
                 // Extract productionCompanyId from the responseJSON
-                const productionCompanyId = responseJSON.productionCompanyId;
+                const productionCompanyId = responseJSON?.productionCompanyId;
+                console.log('WITHIN PRODUCTION DETAILS', productionCompanyId)
         
                 // Make the second fetch using productionCompanyId
-                const pcResponse = await fetchAuthWrapper(`http://192.168.1.156:5555/productionCompanies/${productionCompanyId}`, {
-                // const pcResponse = await fetchAuthWrapper(`http://10.129.3.82:5555/productionCompanies/${productionCompanyId}`, {
+                const pcResponse = await fetchAuthWrapper(URL + `/productionCompanies/${productionCompanyId}`, {
                     method: 'GET',
                 });
 

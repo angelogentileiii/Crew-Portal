@@ -31,23 +31,22 @@ function EventCalendar({ navigation, isModalVisible, setModalVisible }) {
         getEvents,
     } = useCalendar('Crew Portal', '#5351e0', 'Crew Calendar');
 
+    const URL = 'http://192.168.1.156:5555'
+    // const URL = 'http://10.129.3.82:5555'
+
+
     const fetchCalEvents = async () => {
         const endpoint = await currentUserType === 'crew' ? '/user/current' : '/pc/current';
 
         try {
-            // let token = await SecureStore.getItemAsync('accessToken')
-
-            const responseJSON = await fetchAuthWrapper(`http://192.168.1.156:5555/calendarEvents${endpoint}`, {
-            // const responseJSON = await fetchAuthWrapper(`http://10.129.3.82:5555/calendarEvents${endpoint}`, {
+            const responseJSON = await fetchAuthWrapper(URL + `/calendarEvents${endpoint}`, {
                 method: 'GET',
             })
 
             if (responseJSON) {
-                // console.log('AFTER CAL EVENTS FETCH: ', responseJSON)
                 setDBEvents(responseJSON)
 
-                const events = await getEvents()
-                // console.log('GET EVENTS FUNCTION', events)
+                await getEvents()
             } else {
                 setDBEvents([])
             }
@@ -82,8 +81,7 @@ function EventCalendar({ navigation, isModalVisible, setModalVisible }) {
                 if (returnedId) {
                     try {
                         // Send the event data to your backend
-                        await fetchAuthWrapper(`http://192.168.1.156:5555/calendarEvents/`, {
-                        // await fetchAuthWrapper('http://10.129.3.82:5555/calendarEvents/', {
+                        await fetchAuthWrapper(URL + '/calendarEvents/', {
                             method: 'POST',
                             body: JSON.stringify({
                                 startDate,
@@ -113,10 +111,8 @@ function EventCalendar({ navigation, isModalVisible, setModalVisible }) {
 
     const handleDeleteEvent = async (nativeId, id) => {
         try {
-            // console.log('WITHIN HANDLE DELETE', id)
             deleteEventsById(nativeId, 'Crew Calendar')
-            await fetchAuthWrapper(`http://192.168.1.156:5555/calendarEvents/${id}`, {
-            // await fetchAuthWrapper(`http://10.129.3.82:5555/calendarEvents/${id}`, {
+            await fetchAuthWrapper(URL + `/calendarEvents/${id}`, {
                 method: 'DELETE',
             })
             const updatedEvents = dbEvents.filter((event) => event.nativeCalId !== id)
