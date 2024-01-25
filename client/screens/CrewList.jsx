@@ -25,11 +25,14 @@ function CrewList ({ navigation }) {
 
     const fetchAuthWrapper = useFetchAuthWrapper({ navigation })
 
+    const URL = 'http://192.168.1.156:5555'
+    // const URL = 'http://10.129.3.82:5555'
+
+
     const fetchUsers = async () => {
         try {
             await checkAccessToken()
-            const allUsers = await fetchAuthWrapper('http://192.168.1.156:5555/users', {
-            // const allUsers = await fetchAuthWrapper('http://10.129.3.82:5555/users', {
+            const allUsers = await fetchAuthWrapper(URL + '/users', {
                 method: 'GET'
             })
 
@@ -62,15 +65,12 @@ function CrewList ({ navigation }) {
     }
 
     const handleDateSearch = async (start, end) => {
-        const URL = `http://192.168.1.156:5555/users/availableUsers`
-        // const URL = 'http://10.129.3.82:5555/users/availableUsers'
-
         try {
             if (start && !end) {
                 const formatStartDate = start.toISOString().split("T")[0];
                 console.log('FORMATTED: ', formatStartDate)
 
-                const responseJSON = await fetchAuthWrapper(URL + `?startDate=${formatStartDate}`, {
+                const responseJSON = await fetchAuthWrapper(URL + `/users/availableUsers?startDate=${formatStartDate}`, {
                     method: 'GET'
                 })
 
@@ -80,7 +80,7 @@ function CrewList ({ navigation }) {
                 const formatStartDate = start.toISOString().split("T")[0];
                 const formatEndDate = end.toISOString().split("T")[0];
 
-                const responseJSON = await fetchAuthWrapper(URL + `?startDate=${formatStartDate}&endDate=${formatEndDate}`, {
+                const responseJSON = await fetchAuthWrapper(URL + `/users/availableUsers?startDate=${formatStartDate}&endDate=${formatEndDate}`, {
                     method: 'GET'
                 })
 

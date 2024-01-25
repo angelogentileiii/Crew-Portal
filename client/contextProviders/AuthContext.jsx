@@ -10,19 +10,16 @@ export const AuthProvider = ({ children, navigation }) => {
     const [currentUserType, setCurrentUserType] = useState('crew')
     const [currentUser, setCurrentUser] = useState({})
 
-    // home IP: 'http://192.168.1.156:5555/users'
-    // flatiron IP: 'http://10.129.3.82:5555/users'
+    const URL = 'http://192.168.1.156:5555'
+    // const URL = 'http://10.129.3.82:5555'
 
     ////////////////////////////////////////
     // signup post request
     const attemptSignup = async (userInfo, type) => {
         const endpoint = type === 'crew' ? '/auth/signupUser' : '/auth/signupPC';
         
-        console.log('FETCH URL', `http://192.168.1.156:5555${endpoint}`)
-        console.log('WITHIN SIGNUP', type)
         try {
-            const response = await fetch(`http://192.168.1.156:5555${endpoint}`, {
-            // const response = await fetch(`http://10.129.3.82:5555${endpoint}`, {
+            const response = await fetch(URL + endpoint, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -62,8 +59,7 @@ export const AuthProvider = ({ children, navigation }) => {
         const endpoint = await type === 'crew' ? '/auth/loginUser' : '/auth/loginPC';
 
         try {
-            const response = await fetch( `http://192.168.1.156:5555${endpoint}`, {
-            // const response = await fetch( `http://10.129.3.82:5555${endpoint}`, {
+            const response = await fetch(URL + endpoint, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -122,8 +118,7 @@ export const AuthProvider = ({ children, navigation }) => {
             
             if (token) {
                 try {
-                    const response = await fetch(`http://192.168.1.156:5555/auth/decodeToken`, {
-                    // const response = await fetch(`http://10.129.3.82:5555/auth/decodeToken`, {
+                    const response = await fetch(URL + `/auth/decodeToken`, {
                         method: 'POST',
                         headers: {
                             'Accept': 'application/json',
@@ -177,8 +172,8 @@ export const AuthProvider = ({ children, navigation }) => {
         }
 
         try {
-            const response = await fetch('http://192.168.1.156:5555/auth/refreshToken', {
-            // const response = await fetch('http://10.129.3.82:5555/auth/refreshToken', {
+            // const response = await fetch('http://192.168.1.156:5555/auth/refreshToken', {
+            const response = await fetch(URL + '/auth/refreshToken', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -206,8 +201,8 @@ export const AuthProvider = ({ children, navigation }) => {
         console.log('GET CURRENT USER: ', endpoint)
 
         try {
-            const responseJSON = await fetch(`http://192.168.1.156:5555${endpoint}`, {
-            // const responseJSON = await fetch(`http://10.129.3.82:5555${endpoint}`, {
+            // const responseJSON = await fetch(`http://192.168.1.156:5555${endpoint}`, {
+            const responseJSON = await fetch(URL + endpoint, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',

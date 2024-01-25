@@ -18,12 +18,13 @@ function JobBoard({ navigation }){
     // Using the custom fetch wrapper
     const fetchAuthWrapper = useFetchAuthWrapper({ navigation });
 
-    console.log('WITHIN JOBBOARD: ', currentUser)
+    const URL = 'http://192.168.1.156:5555'
+    // const URL = 'http://10.129.3.82:5555'
+
 
     const fetchData = async () => {
         try {
-            const response = await fetchAuthWrapper('http://192.168.1.156:5555/productions', {
-            // const response = await fetchAuthWrapper('http://10.129.3.82:5555/productions', {
+            const response = await fetchAuthWrapper(URL + '/productions', {
                 method: 'GET',
             });
 
@@ -36,13 +37,10 @@ function JobBoard({ navigation }){
     };
 
     const fetchPCProductions = async () => {
-
-        // console.log('WITHIN PC FETCH: ', currentUser.username)
         const pcUsername = await currentUser.username
 
         try {
-            const response = await fetchAuthWrapper(`http://192.168.1.156:5555/productions/byCompany/${pcUsername}`, {
-            // const response = await fetchAuthWrapper(`http://10.129.3.82:5555/productions/byCompany/${pcUsername}`, {
+            const response = await fetchAuthWrapper(URL + `/productions/byCompany/${pcUsername}`, {
                 method: 'GET',
             })
 
@@ -86,7 +84,7 @@ function JobBoard({ navigation }){
 
     const removeProduction = async (id) => {
         try {
-            await fetchAuthWrapper(`http://10.129.3.82:5555/productions/${id}`, {
+            await fetchAuthWrapper(URL + `/productions/${id}`, {
                 method: 'DELETE'
             })
             
@@ -202,6 +200,7 @@ function JobBoard({ navigation }){
             <ScrollView 
                 style={styles.scrollContainer}
                 contentContainerStyle={styles.container}
+                automaticallyAdjustKeyboardInsets={true}
             >
                 {productionInfo}
             </ScrollView>
@@ -267,7 +266,6 @@ const styles = StyleSheet.create({
     scrollContainer: {
         flex: 1,
         width: '100%',
-        // marginBottom: '.25%',
         backgroundColor: '#fff',
         // backgroundColor: 'blue',
     },
